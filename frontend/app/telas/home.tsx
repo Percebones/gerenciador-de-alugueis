@@ -14,11 +14,10 @@ export default function Home() {
       </View>
       <View style={{ padding: 5, width: 200 }}>
         <Button
-          title="Clique Para Cadastro Imoveis"
-          onPress={() => router.push("/telas/CadastroImovel")}
+          title="Clique Para Calculos impostos"
+          onPress={() => router.push("/telas/Impostos")}
         />
       </View>
-
       <View style={{ padding: 5, width: 200 }}>
         <Button
           title="Login"

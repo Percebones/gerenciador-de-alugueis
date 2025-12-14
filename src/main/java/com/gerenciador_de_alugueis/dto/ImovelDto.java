@@ -6,6 +6,7 @@ import com.gerenciador_de_alugueis.enumerators.Status;
 import java.math.BigInteger;
 
 public class ImovelDto {
+    private int idImovel;
     private String nomeImovel;
     private String cepImovel;
     private String ruaImovel;
@@ -17,8 +18,7 @@ public class ImovelDto {
     private BigInteger valor_imovel;
 
 
-
-    public ImovelDto(String nomeImovel, String cepImovel, String ruaImovel, String bairroImovel, String cidadeImovel, Estados estadoImovel, Status statusImovel,BigInteger valorAluguelImovel,BigInteger valor_imovel) {
+    public ImovelDto(String nomeImovel, String cepImovel, String ruaImovel, String bairroImovel, String cidadeImovel, Estados estadoImovel, Status statusImovel, BigInteger valorAluguelImovel, BigInteger valor_imovel) {
         this.nomeImovel = nomeImovel;
         this.cepImovel = cepImovel;
         this.ruaImovel = ruaImovel;
@@ -102,4 +102,7 @@ public class ImovelDto {
         this.valor_imovel = valor_imovel;
     }
 
+    public int getIdImovel() {
+        return idImovel;
+    }
 }

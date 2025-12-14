@@ -2,6 +2,9 @@ import { useState } from "react";
 import { ActivityIndicator, ScrollView, Touchable, TouchableOpacity, View } from "react-native";
 import { createPortal } from "react-dom"
 import { CadastrarImovel } from "../telas/CadastroImovel"
+import { UpdateImovel } from "../telas/UpdateImovel"
+import { DeletarImovel } from "../telas/DeleteImovel";
+
 
 function ModalCadImovel({ children, onClose }: any) {
   return createPortal(
@@ -16,26 +19,26 @@ function ModalCadImovel({ children, onClose }: any) {
   );
 }
 
-function ModalDelImovel({ children, onClose }: any) {
+function ModalDelImovel({ children, idImovel, onClose }: any) {
   return createPortal(
-   <div style={overlay} onClick={onClose}>
+    <div style={overlay} onClick={onClose}>
       <div style={modal} onClick={(e) => e.stopPropagation()}>
         <TouchableOpacity style={{}} onPress={onClose}>✖</TouchableOpacity>
         {children}
-        
+        <DeletarImovel idImovel={idImovel}/>
       </div>
     </div>,
     document.body
   );
 }
 
-function ModalEditImovel({ children, onClose }: any) {
+function ModalEditImovel({ children,idImovel, onClose }: any) {
   return createPortal(
     <div style={overlay} onClick={onClose}>
       <div style={modal} onClick={(e) => e.stopPropagation()}>
         <TouchableOpacity style={{}} onPress={onClose}>✖</TouchableOpacity>
         {children}
-        
+        <UpdateImovel idImovel={idImovel}/>
       </div>
     </div>,
     document.body

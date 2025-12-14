@@ -9,10 +9,11 @@ export default function Lista() {
   const [dados, setDados] = useState<ImovelDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [openCad, setCad] = useState(false);
-    const [openDel, setDel] = useState(false);
+  const [openDel, setDel] = useState(false);
   const [openEdit, setEdit] = useState(false);
-
-
+  const [idImovel, setId] = useState<number | null>(null);
+  const [totAluguel, setTotA] = useState<number>(0);
+  let a = 0
   useEffect(() => {
     api.get("/api/imoveis/busca")
       .then((res) => {
@@ -25,6 +26,19 @@ export default function Lista() {
       .finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    if (dados.length > 0) {
+      let a = 0;
+      for (let index = 0; index < dados.length; index++) {
+        if (dados[index].statusImovel === "Alugado") {
+          a += Number(dados[index].valorAluguelImovel);
+        }
+      }
+      setTotA(a);
+      console.log("Total de aluguel:", a);
+    }
+  }, [dados]);
+
   if (loading) {
     return (
       <View style={{ padding: 20 }}>
@@ -33,6 +47,9 @@ export default function Lista() {
     );
   }
 
+
+
+
   return (
     <ScrollView>
       {openCad && (
@@ -40,17 +57,17 @@ export default function Lista() {
       )}
 
       {openEdit && (
-        <ModalEditImovel onClose={() => setEdit(false)} />
+        <ModalEditImovel idImovel={idImovel} onClose={() => setEdit(false)} />
       )}
 
       {openDel && (
-        <ModalDelImovel onClose={() => setDel(false)} />
+        <ModalDelImovel idImovel={idImovel} onClose={() => setDel(false)} />
       )}
 
       <ScrollView style={{ alignSelf: 'center' }}>
         <View style={{ padding: 20, width: 1300 }}>
           <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>
-            Lista de Imóveis
+            |Lista de Imóveis | Soma dos Alugueis: R${totAluguel.toLocaleString('pt-BR')}|
           </Text>
 
           <DataTable style={{ backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden' }}>
@@ -108,11 +125,11 @@ export default function Lista() {
                 </DataTable.Cell>
 
                 <DataTable.Cell style={{ flex: 2 }}>
-                  <TouchableOpacity onPress={() => setEdit(true)}>✎</TouchableOpacity>
+                  <TouchableOpacity onPress={() => { setEdit(true); setId(item.idImovel); }}>✎</TouchableOpacity>
                 </DataTable.Cell>
 
                 <DataTable.Cell>
-                 <TouchableOpacity onPress={() => setDel(true)}>✖</TouchableOpacity>
+                  <TouchableOpacity onPress={() => { setDel(true); setId(item.idImovel); }}>✖</TouchableOpacity>
                 </DataTable.Cell>
 
               </DataTable.Row>

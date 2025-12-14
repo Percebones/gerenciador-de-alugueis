@@ -15,13 +15,13 @@ public class Imovel {
     @Column(name = "id_imovel")
     private int idImovel;
 
-    @Column(name = "nome_imovel",nullable = false)
+    @Column(name = "nome_imovel", nullable = false)
     private String nomeImovel;
 
-    @Column(name = "cep_imovel",nullable = false)
+    @Column(name = "cep_imovel", nullable = false)
     private String cepImovel;
 
-    @Column(name = "rua_imovel",nullable = false)
+    @Column(name = "rua_imovel", nullable = false)
     private String ruaImovel;
 
     @Column(name = "bairro_imovel")
@@ -44,7 +44,7 @@ public class Imovel {
     @Column(name = "valor_imovel")
     private BigInteger valor_imovel;
 
-    public Imovel(){
+    public Imovel() {
     }
 
     public Imovel(ImovelDto imovelDto) {

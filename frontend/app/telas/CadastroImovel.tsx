@@ -33,14 +33,15 @@ function CadastrarImovel() {
     } else if (dados.ruaImovel === "") {
       alert("Rua do imovel não pode ser vazio")
     } else if (dados.estadoImovel === "") {
-      alert("Estado cadastrado com Sucesso")
+      alert("Estado do imovel não pode ser vazio")
     } else if (dados.statusImovel === "") {
-      alert("Status cadastrado com Sucesso")
+      alert("Status do imovel não pode ser vazio")
     } else {
       api.post("/api/imoveis/cria", dados)
         .then(() => {
           Alert.alert("Sucesso", "Imóvel cadastrado!");
           alert("Imovel cadastrado com Sucesso")
+          window.location.reload();
         })
         .catch((err) => {
           console.log("ERRO API:", err.response?.data);
@@ -55,13 +56,13 @@ function CadastrarImovel() {
     <ScrollView style={{ padding: 20 }}>
       <Text style={{ fontSize: 20, marginBottom: 20 }}>Cadastrar Imóvel</Text>
 
-      <Text>Nome</Text>
+      <Text>Nome *</Text>
       <TextInput style={{ borderWidth: 1, marginBottom: 10, padding: 5 }} value={nome} onChangeText={setNome} />
 
-      <Text>CEP</Text>
+      <Text>CEP *</Text>
       <TextInput maxLength={8} style={{ borderWidth: 1, marginBottom: 10, padding: 5 }} value={cep} onChangeText={setCep} />
 
-      <Text>Rua</Text>
+      <Text>Rua *</Text>
       <TextInput style={{ borderWidth: 1, marginBottom: 10, padding: 5 }} value={rua} onChangeText={setRua} />
 
       <Text>Bairro</Text>

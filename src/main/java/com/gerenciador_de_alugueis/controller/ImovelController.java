@@ -18,7 +18,7 @@ public class ImovelController {
     private ImovelService imovelService;
 
     @PostMapping(path = "/cria")
-    public ResponseEntity<?> CadImovel(@RequestBody ImovelDto imovelDto) throws Exception{
+    public ResponseEntity<?> CadImovel(@RequestBody ImovelDto imovelDto) throws Exception {
         try {
             Imovel imovel = new Imovel(imovelDto);
             imovelService.cadastroImovel(imovel);
@@ -29,16 +29,16 @@ public class ImovelController {
     }
 
     @PostMapping(path = "/update")
-    public ResponseEntity<?> UpdateImovel(@RequestBody ImovelDto imovelDto) throws Exception{
+    public ResponseEntity<?> UpdateImovel(@RequestBody ImovelDto imovelDto) throws Exception {
         try {
-            Imovel imovel = new Imovel(imovelDto);
+            imovelService.atualizarImovel(imovelDto);
             return new ResponseEntity<>("Imovel atualizado com sucesso", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>("Erro ao atualizar Imovel" + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/del/{id}")
     public ResponseEntity<Void> deletarImovel(@PathVariable Long id) {
         try {
             imovelService.deletarPorId(id);
@@ -52,6 +52,12 @@ public class ImovelController {
     public ResponseEntity<Iterable<Imovel>> getAllImoveis() {
         Iterable<Imovel> imoveis = imovelService.getAllImoveis();
         return new ResponseEntity<>(imoveis, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/porID/{id}")
+    public ResponseEntity<Imovel> getImoveisById(@PathVariable int id) {
+        Imovel imovel = imovelService.getImovelById(id);
+        return new ResponseEntity<>(imovel, HttpStatus.OK);
     }
 
 

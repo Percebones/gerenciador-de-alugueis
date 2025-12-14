@@ -13,4 +13,6 @@ public interface ImovelRpo extends GenericRpo<Imovel> {
     boolean existsByNomeImovel(String nome);
 
     Optional<Imovel> findAllByIdImovel(int id);
+
+    Imovel findByIdImovel(int id);
 }
