@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Alert, Button, ScrollView, Text, TextInput } from 'react-native';
 import api from '../services/api';
 
-export default function CadastrarImovel({ voltarParaLista }: { voltarParaLista: () => void }) {
+function CadastrarImovel() {
   const [nome, setNome] = useState('');
   const [cep, setCep] = useState('');
   const [rua, setRua] = useState('');
@@ -26,16 +26,29 @@ export default function CadastrarImovel({ voltarParaLista }: { voltarParaLista: 
       valor_imovel: Number(valor),
       statusImovel: status,
     };
-    api.post("/api/imoveis/cria", dados)
-      .then(() => {
-        Alert.alert("Sucesso", "Imóvel cadastrado!");
-        alert("Imovel cadastrado com Sucesso")
-      })
-      .catch((err) => {
-        console.log("ERRO API:", err);
-        const mensagem = err.response?.data;
-        alert(mensagem);
-      });
+    if (dados.nomeImovel === "") {
+      alert("Nome do imovel não pode ser vazio")
+    } else if (dados.cepImovel === "") {
+      alert("CEP do imovel não pode ser vazio")
+    } else if (dados.ruaImovel === "") {
+      alert("Rua do imovel não pode ser vazio")
+    } else if (dados.estadoImovel === "") {
+      alert("Estado cadastrado com Sucesso")
+    } else if (dados.statusImovel === "") {
+      alert("Status cadastrado com Sucesso")
+    } else {
+      api.post("/api/imoveis/cria", dados)
+        .then(() => {
+          Alert.alert("Sucesso", "Imóvel cadastrado!");
+          alert("Imovel cadastrado com Sucesso")
+        })
+        .catch((err) => {
+          console.log("ERRO API:", err.response?.data);
+          const mensagem = err.response?.data;
+          alert(mensagem);
+        });
+    }
+
   };
 
   return (
@@ -87,3 +100,5 @@ export default function CadastrarImovel({ voltarParaLista }: { voltarParaLista: 
     </ScrollView>
   );
 }
+
+export { CadastrarImovel }

@@ -1,12 +1,17 @@
 import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, View } from "react-native";
+import { ActivityIndicator, ScrollView, Touchable, TouchableOpacity, View } from "react-native";
 import { DataTable, Text } from "react-native-paper";
 import api from "../services/api";
 import { ImovelDto } from "../types/types";
+import { ModalCadImovel, ModalDelImovel, ModalEditImovel } from "../components/modals"
 
 export default function Lista() {
   const [dados, setDados] = useState<ImovelDto[]>([]);
   const [loading, setLoading] = useState(true);
+  const [openCad, setCad] = useState(false);
+    const [openDel, setDel] = useState(false);
+  const [openEdit, setEdit] = useState(false);
+
 
   useEffect(() => {
     api.get("/api/imoveis/busca")
@@ -30,8 +35,20 @@ export default function Lista() {
 
   return (
     <ScrollView>
+      {openCad && (
+        <ModalCadImovel onClose={() => setCad(false)} />
+      )}
+
+      {openEdit && (
+        <ModalEditImovel onClose={() => setEdit(false)} />
+      )}
+
+      {openDel && (
+        <ModalDelImovel onClose={() => setDel(false)} />
+      )}
+
       <ScrollView style={{ alignSelf: 'center' }}>
-        <View style={{ padding: 20, width: 1000 }}>
+        <View style={{ padding: 20, width: 1300 }}>
           <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>
             Lista de Imóveis
           </Text>
@@ -44,12 +61,14 @@ export default function Lista() {
               <DataTable.Title style={{ flex: 4 }}>BAIRRO</DataTable.Title>
               <DataTable.Title style={{ flex: 4 }}>CIDADE</DataTable.Title>
               <DataTable.Title style={{ flex: 4 }}>ESTADO</DataTable.Title>
-              <DataTable.Title numeric style={{ flex: 3 }}>ALUGUEL</DataTable.Title>
+              <DataTable.Title numeric style={{ flex: 2 }}>ALUGUEL</DataTable.Title>
               <DataTable.Title numeric style={{ flex: 5 }}>VALOR IMÓVEL</DataTable.Title>
-              <DataTable.Title style={{ flex: 4, paddingLeft: 40 }}>STATUS</DataTable.Title>
+              <DataTable.Title style={{ flex: 3, paddingLeft: 50 }}>STATUS</DataTable.Title>
+              <DataTable.Title style={{ flex: 2 }}> </DataTable.Title>
+              <DataTable.Title style={{ flex: 2 }}><TouchableOpacity onPress={() => setCad(true)}>📑</TouchableOpacity></DataTable.Title>
             </DataTable.Header>
 
-            
+
             {dados.map((item) => (
               <DataTable.Row
                 key={item.idImovel}
@@ -65,20 +84,18 @@ export default function Lista() {
                 <DataTable.Cell style={{ flex: 8 }}>{item.ruaImovel}</DataTable.Cell>
                 <DataTable.Cell style={{ flex: 4 }}>{item.bairroImovel}</DataTable.Cell>
                 <DataTable.Cell style={{ flex: 4 }}>{item.cidadeImovel}</DataTable.Cell>
-                <DataTable.Cell style={{ flex: 4 }}>{item.estadoImovel}</DataTable.Cell>
-
+                <DataTable.Cell style={{ flex: 3.4 }}>{item.estadoImovel}</DataTable.Cell>
                 <DataTable.Cell numeric style={{ flex: 3 }}>
                   <Text style={{ fontWeight: 'bold', color: '#0066cc' }}>
                     R$ {Number(item.valorAluguelImovel).toLocaleString('pt-BR')}
                   </Text>
                 </DataTable.Cell>
-                <DataTable.Cell numeric style={{ flex: 5 }}>
+                <DataTable.Cell numeric style={{ flex: 4 }}>
                   <Text style={{ fontSize: 15, fontWeight: 'bold' }}>
                     R$ {Number(item.valor_imovel).toLocaleString('pt-BR')}
                   </Text>
                 </DataTable.Cell>
-
-                <DataTable.Cell style={{ flex: 4, paddingLeft: 40 }}>
+                <DataTable.Cell style={{ flex: 4, paddingLeft: 70 }}>
                   <Text style={{
                     color: item.statusImovel === 'Alugado' ? '#006400' : '#c62828',
                     padding: 2,
@@ -89,6 +106,15 @@ export default function Lista() {
                     {item.statusImovel?.toUpperCase()}
                   </Text>
                 </DataTable.Cell>
+
+                <DataTable.Cell style={{ flex: 2 }}>
+                  <TouchableOpacity onPress={() => setEdit(true)}>✎</TouchableOpacity>
+                </DataTable.Cell>
+
+                <DataTable.Cell>
+                 <TouchableOpacity onPress={() => setDel(true)}>✖</TouchableOpacity>
+                </DataTable.Cell>
+
               </DataTable.Row>
             ))}
           </DataTable>
