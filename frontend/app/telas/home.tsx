@@ -14,8 +14,8 @@ export default function Home() {
       </View>
       <View style={{ padding: 5, width: 200 }}>
         <Button
-          title="Clique Para Calculos impostos"
-          onPress={() => router.push("/telas/Impostos")}
+          title="Clique Para Painel"
+          onPress={() => router.push("/telas/painel")}
         />
       </View>
       <View style={{ padding: 5, width: 200 }}>

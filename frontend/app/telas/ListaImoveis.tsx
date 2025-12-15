@@ -51,7 +51,7 @@ export default function Lista() {
 
 
   return (
-    <ScrollView>
+    <ScrollView style={{padding: 20}}>
       {openCad && (
         <ModalCadImovel onClose={() => setCad(false)} />
       )}
@@ -140,3 +140,5 @@ export default function Lista() {
     </ScrollView>
   );
 }
+
+export {Lista}
