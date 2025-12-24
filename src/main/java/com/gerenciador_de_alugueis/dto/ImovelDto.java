@@ -2,32 +2,27 @@ package com.gerenciador_de_alugueis.dto;
 
 import com.gerenciador_de_alugueis.enumerators.Estados;
 import com.gerenciador_de_alugueis.enumerators.Status;
+import com.gerenciador_de_alugueis.model.Endereco;
 
 import java.math.BigInteger;
 
 public class ImovelDto {
     private int idImovel;
     private String nomeImovel;
-    private String cepImovel;
-    private String ruaImovel;
-    private String bairroImovel;
-    private String cidadeImovel;
-    private Estados estadoImovel;
     private Status statusImovel;
     private BigInteger valorAluguelImovel;
     private BigInteger valor_imovel;
+    private Endereco endereco;
 
+    public ImovelDto() {
+    }
 
-    public ImovelDto(String nomeImovel, String cepImovel, String ruaImovel, String bairroImovel, String cidadeImovel, Estados estadoImovel, Status statusImovel, BigInteger valorAluguelImovel, BigInteger valor_imovel) {
+    public ImovelDto(String nomeImovel, String cepImovel, String ruaImovel, String bairroImovel, String cidadeImovel, Estados estadoImovel, Status statusImovel, BigInteger valorAluguelImovel, BigInteger valor_imovel,Endereco endereco) {
         this.nomeImovel = nomeImovel;
-        this.cepImovel = cepImovel;
-        this.ruaImovel = ruaImovel;
-        this.bairroImovel = bairroImovel;
-        this.cidadeImovel = cidadeImovel;
-        this.estadoImovel = estadoImovel;
         this.statusImovel = statusImovel;
         this.valorAluguelImovel = valorAluguelImovel;
         this.valor_imovel = valor_imovel;
+        this.endereco = endereco;
     }
 
     public String getNomeImovel() {
@@ -36,46 +31,6 @@ public class ImovelDto {
 
     public void setNomeImovel(String nomeImovel) {
         this.nomeImovel = nomeImovel;
-    }
-
-    public String getCepImovel() {
-        return cepImovel;
-    }
-
-    public void setCepImovel(String cepImovel) {
-        this.cepImovel = cepImovel;
-    }
-
-    public String getRuaImovel() {
-        return ruaImovel;
-    }
-
-    public void setRuaImovel(String ruaImovel) {
-        this.ruaImovel = ruaImovel;
-    }
-
-    public String getBairroImovel() {
-        return bairroImovel;
-    }
-
-    public void setBairroImovel(String bairroImovel) {
-        this.bairroImovel = bairroImovel;
-    }
-
-    public String getCidadeImovel() {
-        return cidadeImovel;
-    }
-
-    public void setCidadeImovel(String cidadeImovel) {
-        this.cidadeImovel = cidadeImovel;
-    }
-
-    public Estados getEstadoImovel() {
-        return estadoImovel;
-    }
-
-    public void setEstadoImovel(Estados estadoImovel) {
-        this.estadoImovel = estadoImovel;
     }
 
     public Status getStatusImovel() {
@@ -104,5 +59,13 @@ public class ImovelDto {
 
     public int getIdImovel() {
         return idImovel;
+    }
+
+    public Endereco getEndereco() {
+        return endereco;
+    }
+
+    public void setEndereco(Endereco endereco) {
+        this.endereco = endereco;
     }
 }

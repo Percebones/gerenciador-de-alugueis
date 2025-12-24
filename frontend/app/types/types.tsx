@@ -1,13 +1,16 @@
 // src/types/imovel.types.ts
-
-export interface ImovelDto {
-  idImovel: number;
-  nomeImovel: string;
+export interface EnderecoDto {
   cepImovel: string;
   ruaImovel: string;
   bairroImovel: string;
   cidadeImovel: string;
   estadoImovel: string;
+}
+
+export interface ImovelDto {
+  idImovel: number;
+  nomeImovel: string;
+  endereco:EnderecoDto;
   statusImovel: string;
   valorAluguelImovel: bigint;
   valor_imovel: bigint;

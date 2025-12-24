@@ -1,16 +1,12 @@
-function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 import * as React from 'react';
 import { Animated, Easing, Platform, StyleSheet, View } from 'react-native';
-import { withInternalTheme } from '../core/theming';
+import { useInternalTheme } from '../core/theming';
 const DURATION = 2400;
 
 /**
  * Activity indicator is used to present progress of some activity in the app.
- * It can be used as a drop-in for the ActivityIndicator shipped with React Native.
- *
- * <div class="screenshots">
- *   <img src="screenshots/activity-indicator.gif" style="width: 100px;" />
- * </div>
+ * It can be used as a drop-in replacement for the ActivityIndicator shipped with React Native.
  *
  * ## Usage
  * ```js
@@ -24,17 +20,17 @@ const DURATION = 2400;
  * export default MyComponent;
  * ```
  */
-const ActivityIndicator = _ref => {
+const ActivityIndicator = ({
+  animating = true,
+  color: indicatorColor,
+  hidesWhenStopped = true,
+  size: indicatorSize = 'small',
+  style,
+  theme: themeOverrides,
+  ...rest
+}) => {
   var _theme$colors;
-  let {
-    animating = true,
-    color: indicatorColor,
-    hidesWhenStopped = true,
-    size: indicatorSize = 'small',
-    style,
-    theme,
-    ...rest
-  } = _ref;
+  const theme = useInternalTheme(themeOverrides);
   const {
     current: timer
   } = React.useRef(new Animated.Value(0));
@@ -191,5 +187,5 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   }
 });
-export default withInternalTheme(ActivityIndicator);
+export default ActivityIndicator;
 //# sourceMappingURL=ActivityIndicator.js.map

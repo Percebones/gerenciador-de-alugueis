@@ -1,19 +1,13 @@
-function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { withInternalTheme } from '../../core/theming';
+import { useInternalTheme } from '../../core/theming';
 import { white } from '../../styles/themes/v2/colors';
 import getContrastingColor from '../../utils/getContrastingColor';
 import Icon from '../Icon';
 const defaultSize = 64;
 /**
  * Avatars can be used to represent people in a graphical way.
- *
- * <div class="screenshots">
- *   <figure>
- *     <img class="medium" src="screenshots/avatar-icon.png" />
- *   </figure>
- * </div>
  *
  * ## Usage
  * ```js
@@ -25,20 +19,20 @@ const defaultSize = 64;
  * );
  * ```
  */
-const Avatar = _ref => {
-  var _theme$colors, _rest$color;
-  let {
-    icon,
-    size = defaultSize,
-    style,
-    theme,
-    ...rest
-  } = _ref;
+const Avatar = ({
+  icon,
+  size = defaultSize,
+  style,
+  theme: themeOverrides,
+  ...rest
+}) => {
+  var _theme$colors;
+  const theme = useInternalTheme(themeOverrides);
   const {
     backgroundColor = (_theme$colors = theme.colors) === null || _theme$colors === void 0 ? void 0 : _theme$colors.primary,
     ...restStyle
   } = StyleSheet.flatten(style) || {};
-  const textColor = (_rest$color = rest.color) !== null && _rest$color !== void 0 ? _rest$color : getContrastingColor(backgroundColor, white, 'rgba(0, 0, 0, .54)');
+  const textColor = rest.color ?? getContrastingColor(backgroundColor, white, 'rgba(0, 0, 0, .54)');
   return /*#__PURE__*/React.createElement(View, _extends({
     style: [{
       width: size,
@@ -59,5 +53,5 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   }
 });
-export default withInternalTheme(Avatar);
+export default Avatar;
 //# sourceMappingURL=AvatarIcon.js.map

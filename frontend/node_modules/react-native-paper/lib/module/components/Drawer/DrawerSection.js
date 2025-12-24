@@ -1,19 +1,13 @@
-function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import color from 'color';
-import { withInternalTheme } from '../../core/theming';
+import { useInternalTheme } from '../../core/theming';
 import { MD3Colors } from '../../styles/themes/v3/tokens';
 import Divider from '../Divider';
 import Text from '../Typography/Text';
 /**
  * A component to group content inside a navigation drawer.
- *
- * <div class="screenshots">
- *   <figure>
- *     <img class="small" src="screenshots/drawer-section.png" />
- *   </figure>
- * </div>
  *
  * ## Usage
  * ```js
@@ -42,15 +36,16 @@ import Text from '../Typography/Text';
  * export default MyComponent;
  * ```
  */
-const DrawerSection = _ref => {
-  let {
-    children,
-    title,
-    theme,
-    style,
-    showDivider = true,
-    ...rest
-  } = _ref;
+const DrawerSection = ({
+  children,
+  title,
+  theme: themeOverrides,
+  style,
+  showDivider = true,
+  titleMaxFontSizeMultiplier,
+  ...rest
+}) => {
+  const theme = useInternalTheme(themeOverrides);
   const {
     isV3
   } = theme;
@@ -68,12 +63,14 @@ const DrawerSection = _ref => {
       color: titleColor,
       marginLeft: titleMargin,
       ...font
-    }]
+    }],
+    maxFontSizeMultiplier: titleMaxFontSizeMultiplier
   }, title)), children, showDivider && /*#__PURE__*/React.createElement(Divider, _extends({}, isV3 && {
     horizontalInset: true,
     bold: true
   }, {
-    style: [styles.divider, isV3 && styles.v3Divider]
+    style: [styles.divider, isV3 && styles.v3Divider],
+    theme: theme
   })));
 };
 DrawerSection.displayName = 'Drawer.Section';
@@ -95,5 +92,5 @@ const styles = StyleSheet.create({
     backgroundColor: MD3Colors.neutralVariant50
   }
 });
-export default withInternalTheme(DrawerSection);
+export default DrawerSection;
 //# sourceMappingURL=DrawerSection.js.map

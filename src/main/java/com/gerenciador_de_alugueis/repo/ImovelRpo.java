@@ -8,8 +8,6 @@ import java.util.Optional;
 @Repository
 public interface ImovelRpo extends GenericRpo<Imovel> {
 
-    boolean existsByCepImovel(String cep);
-
     boolean existsByNomeImovel(String nome);
 
     Optional<Imovel> findAllByIdImovel(int id);

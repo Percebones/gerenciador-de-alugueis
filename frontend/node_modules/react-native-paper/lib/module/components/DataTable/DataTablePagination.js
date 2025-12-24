@@ -1,111 +1,114 @@
-function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 import * as React from 'react';
 import { I18nManager, StyleSheet, View } from 'react-native';
 import color from 'color';
-import { useInternalTheme, withInternalTheme } from '../../core/theming';
+import { useInternalTheme } from '../../core/theming';
 import Button from '../Button/Button';
 import IconButton from '../IconButton/IconButton';
 import MaterialCommunityIcon from '../MaterialCommunityIcon';
 import Menu from '../Menu/Menu';
 import Text from '../Typography/Text';
-const PaginationControls = _ref => {
-  let {
-    page,
-    numberOfPages,
-    onPageChange,
-    showFastPaginationControls
-  } = _ref;
-  const theme = useInternalTheme();
+const PaginationControls = ({
+  page,
+  numberOfPages,
+  onPageChange,
+  showFastPaginationControls,
+  theme: themeOverrides,
+  paginationControlRippleColor
+}) => {
+  const theme = useInternalTheme(themeOverrides);
   const textColor = theme.isV3 ? theme.colors.onSurface : theme.colors.text;
   return /*#__PURE__*/React.createElement(React.Fragment, null, showFastPaginationControls ? /*#__PURE__*/React.createElement(IconButton, {
-    icon: _ref2 => {
-      let {
-        size,
-        color
-      } = _ref2;
-      return /*#__PURE__*/React.createElement(MaterialCommunityIcon, {
-        name: "page-first",
-        color: color,
-        size: size,
-        direction: I18nManager.getConstants().isRTL ? 'rtl' : 'ltr'
-      });
-    },
+    icon: ({
+      size,
+      color
+    }) => /*#__PURE__*/React.createElement(MaterialCommunityIcon, {
+      name: "page-first",
+      color: color,
+      size: size,
+      direction: I18nManager.getConstants().isRTL ? 'rtl' : 'ltr'
+    }),
     iconColor: textColor,
+    rippleColor: paginationControlRippleColor,
     disabled: page === 0,
     onPress: () => onPageChange(0),
-    accessibilityLabel: "page-first"
+    accessibilityLabel: "page-first",
+    theme: theme
   }) : null, /*#__PURE__*/React.createElement(IconButton, {
-    icon: _ref3 => {
-      let {
-        size,
-        color
-      } = _ref3;
-      return /*#__PURE__*/React.createElement(MaterialCommunityIcon, {
-        name: "chevron-left",
-        color: color,
-        size: size,
-        direction: I18nManager.getConstants().isRTL ? 'rtl' : 'ltr'
-      });
-    },
+    icon: ({
+      size,
+      color
+    }) => /*#__PURE__*/React.createElement(MaterialCommunityIcon, {
+      name: "chevron-left",
+      color: color,
+      size: size,
+      direction: I18nManager.getConstants().isRTL ? 'rtl' : 'ltr'
+    }),
     iconColor: textColor,
+    rippleColor: paginationControlRippleColor,
     disabled: page === 0,
     onPress: () => onPageChange(page - 1),
-    accessibilityLabel: "chevron-left"
+    accessibilityLabel: "chevron-left",
+    theme: theme
   }), /*#__PURE__*/React.createElement(IconButton, {
-    icon: _ref4 => {
-      let {
-        size,
-        color
-      } = _ref4;
-      return /*#__PURE__*/React.createElement(MaterialCommunityIcon, {
-        name: "chevron-right",
-        color: color,
-        size: size,
-        direction: I18nManager.getConstants().isRTL ? 'rtl' : 'ltr'
-      });
-    },
+    icon: ({
+      size,
+      color
+    }) => /*#__PURE__*/React.createElement(MaterialCommunityIcon, {
+      name: "chevron-right",
+      color: color,
+      size: size,
+      direction: I18nManager.getConstants().isRTL ? 'rtl' : 'ltr'
+    }),
     iconColor: textColor,
+    rippleColor: paginationControlRippleColor,
     disabled: numberOfPages === 0 || page === numberOfPages - 1,
     onPress: () => onPageChange(page + 1),
-    accessibilityLabel: "chevron-right"
+    accessibilityLabel: "chevron-right",
+    theme: theme
   }), showFastPaginationControls ? /*#__PURE__*/React.createElement(IconButton, {
-    icon: _ref5 => {
-      let {
-        size,
-        color
-      } = _ref5;
-      return /*#__PURE__*/React.createElement(MaterialCommunityIcon, {
-        name: "page-last",
-        color: color,
-        size: size,
-        direction: I18nManager.getConstants().isRTL ? 'rtl' : 'ltr'
-      });
-    },
+    icon: ({
+      size,
+      color
+    }) => /*#__PURE__*/React.createElement(MaterialCommunityIcon, {
+      name: "page-last",
+      color: color,
+      size: size,
+      direction: I18nManager.getConstants().isRTL ? 'rtl' : 'ltr'
+    }),
     iconColor: textColor,
+    rippleColor: paginationControlRippleColor,
     disabled: numberOfPages === 0 || page === numberOfPages - 1,
     onPress: () => onPageChange(numberOfPages - 1),
-    accessibilityLabel: "page-last"
+    accessibilityLabel: "page-last",
+    theme: theme
   }) : null);
 };
-const PaginationDropdown = _ref6 => {
-  let {
-    numberOfItemsPerPageList,
-    numberOfItemsPerPage,
-    onItemsPerPageChange
-  } = _ref6;
+const PaginationDropdown = ({
+  numberOfItemsPerPageList,
+  numberOfItemsPerPage,
+  onItemsPerPageChange,
+  theme: themeOverrides,
+  selectPageDropdownRippleColor,
+  dropdownItemRippleColor
+}) => {
+  const theme = useInternalTheme(themeOverrides);
   const {
     colors
-  } = useInternalTheme();
+  } = theme;
   const [showSelect, toggleSelect] = React.useState(false);
   return /*#__PURE__*/React.createElement(Menu, {
     visible: showSelect,
     onDismiss: () => toggleSelect(!showSelect),
+    theme: theme,
     anchor: /*#__PURE__*/React.createElement(Button, {
       mode: "outlined",
       onPress: () => toggleSelect(true),
       style: styles.button,
       icon: "menu-down",
-      contentStyle: styles.contentStyle
+      contentStyle: styles.contentStyle,
+      theme: theme,
+      rippleColor: selectPageDropdownRippleColor
     }, `${numberOfItemsPerPage}`)
   }, numberOfItemsPerPageList === null || numberOfItemsPerPageList === void 0 ? void 0 : numberOfItemsPerPageList.map(option => /*#__PURE__*/React.createElement(Menu.Item, {
     key: option,
@@ -113,22 +116,17 @@ const PaginationDropdown = _ref6 => {
       color: colors === null || colors === void 0 ? void 0 : colors.primary
     },
     onPress: () => {
-      onItemsPerPageChange === null || onItemsPerPageChange === void 0 ? void 0 : onItemsPerPageChange(option);
+      onItemsPerPageChange === null || onItemsPerPageChange === void 0 || onItemsPerPageChange(option);
       toggleSelect(false);
     },
-    title: option
+    rippleColor: dropdownItemRippleColor,
+    title: option,
+    theme: theme
   })));
 };
 
 /**
  * A component to show pagination for data table.
- *
- * <div class="screenshots">
- *   <figure>
- *     <img class="medium" src="screenshots/data-table-pagination.png" />
- *   </figure>
- * </div>
- *
  *
  * ## Usage
  * ```js
@@ -182,23 +180,25 @@ const PaginationDropdown = _ref6 => {
  * export default MyComponent;
  * ```
  */
-const DataTablePagination = _ref7 => {
-  let {
-    label,
-    accessibilityLabel,
-    page,
-    numberOfPages,
-    onPageChange,
-    style,
-    theme,
-    showFastPaginationControls = false,
-    numberOfItemsPerPageList,
-    numberOfItemsPerPage,
-    onItemsPerPageChange,
-    selectPageDropdownLabel,
-    selectPageDropdownAccessibilityLabel,
-    ...rest
-  } = _ref7;
+const DataTablePagination = ({
+  label,
+  accessibilityLabel,
+  page,
+  numberOfPages,
+  onPageChange,
+  style,
+  showFastPaginationControls = false,
+  numberOfItemsPerPageList,
+  numberOfItemsPerPage,
+  onItemsPerPageChange,
+  selectPageDropdownLabel,
+  selectPageDropdownAccessibilityLabel,
+  selectPageDropdownRippleColor,
+  dropdownItemRippleColor,
+  theme: themeOverrides,
+  ...rest
+}) => {
+  const theme = useInternalTheme(themeOverrides);
   const labelColor = color(theme.isV3 ? theme.colors.onSurface : theme === null || theme === void 0 ? void 0 : theme.colors.text).alpha(0.6).rgb().string();
   return /*#__PURE__*/React.createElement(View, _extends({}, rest, {
     style: [styles.container, style],
@@ -215,7 +215,10 @@ const DataTablePagination = _ref7 => {
   }, selectPageDropdownLabel), /*#__PURE__*/React.createElement(PaginationDropdown, {
     numberOfItemsPerPageList: numberOfItemsPerPageList,
     numberOfItemsPerPage: numberOfItemsPerPage,
-    onItemsPerPageChange: onItemsPerPageChange
+    onItemsPerPageChange: onItemsPerPageChange,
+    selectPageDropdownRippleColor: selectPageDropdownRippleColor,
+    dropdownItemRippleColor: dropdownItemRippleColor,
+    theme: theme
   })), /*#__PURE__*/React.createElement(Text, {
     style: [styles.label, {
       color: labelColor
@@ -228,7 +231,8 @@ const DataTablePagination = _ref7 => {
     showFastPaginationControls: showFastPaginationControls,
     onPageChange: onPageChange,
     page: page,
-    numberOfPages: numberOfPages
+    numberOfPages: numberOfPages,
+    theme: theme
   })));
 };
 DataTablePagination.displayName = 'DataTable.Pagination';
@@ -260,7 +264,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row-reverse'
   }
 });
-export default withInternalTheme(DataTablePagination);
+export default DataTablePagination;
 
 // @component-docs ignore-next-line
 export { DataTablePagination };

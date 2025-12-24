@@ -11,12 +11,12 @@ export default function Painel() {
 
     return (
         <ScrollView>
-           <View>
+           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <Lista/>
-           </View>
-           <View>
+           </ScrollView>
+           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <Impostos/>
-           </View>
+           </ScrollView>
         </ScrollView>
     );
 }

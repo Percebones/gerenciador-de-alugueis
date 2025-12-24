@@ -1,8 +1,8 @@
-function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 import * as React from 'react';
 import { Animated, I18nManager, Platform, StyleSheet, View } from 'react-native';
 import setColor from 'color';
-import { withInternalTheme } from '../core/theming';
+import { useInternalTheme } from '../core/theming';
 const INDETERMINATE_DURATION = 2000;
 const INDETERMINATE_MAX_WIDTH = 0.6;
 const {
@@ -11,10 +11,6 @@ const {
 
 /**
  * Progress bar is an indicator used to present progress of some activity in the app.
- *
- * <div class="screenshots">
- *   <img src="screenshots/progress-bar.png" />
- * </div>
  *
  * ## Usage
  * ```js
@@ -28,30 +24,37 @@ const {
  * export default MyComponent;
  * ```
  */
-const ProgressBar = _ref => {
+const ProgressBar = ({
+  color,
+  indeterminate,
+  progress = 0,
+  visible = true,
+  theme: themeOverrides,
+  animatedValue,
+  style,
+  fillStyle,
+  testID = 'progress-bar',
+  ...rest
+}) => {
   var _theme$colors;
-  let {
-    color,
-    indeterminate,
-    style,
-    progress = 0,
-    visible = true,
-    theme,
-    animatedValue,
-    ...rest
-  } = _ref;
+  const isWeb = Platform.OS === 'web';
+  const theme = useInternalTheme(themeOverrides);
   const {
     current: timer
   } = React.useRef(new Animated.Value(0));
   const {
     current: fade
   } = React.useRef(new Animated.Value(0));
+  const passedAnimatedValue = React.useRef(animatedValue);
   const [width, setWidth] = React.useState(0);
   const [prevWidth, setPrevWidth] = React.useState(0);
   const indeterminateAnimation = React.useRef(null);
   const {
     scale
   } = theme.animation;
+  React.useEffect(() => {
+    passedAnimatedValue.current = animatedValue;
+  });
   const startAnimation = React.useCallback(() => {
     // Show progress bar
     Animated.timing(fade, {
@@ -60,7 +63,15 @@ const ProgressBar = _ref => {
       useNativeDriver: true,
       isInteraction: false
     }).start();
-    if (animatedValue && animatedValue >= 0) {
+
+    /**
+     * We shouldn't add @param animatedValue to the
+     * deps array, to avoid the unnecessary loop.
+     * We can only check if the prop is passed initially,
+     * and we do early return.
+     */
+    const externalAnimation = typeof passedAnimatedValue.current !== 'undefined' && passedAnimatedValue.current >= 0;
+    if (externalAnimation) {
       return;
     }
 
@@ -71,7 +82,7 @@ const ProgressBar = _ref => {
           duration: INDETERMINATE_DURATION,
           toValue: 1,
           // Animated.loop does not work if useNativeDriver is true on web
-          useNativeDriver: Platform.OS !== 'web',
+          useNativeDriver: !isWeb,
           isInteraction: false
         });
       }
@@ -87,13 +98,7 @@ const ProgressBar = _ref => {
         isInteraction: false
       }).start();
     }
-    /**
-     * We shouldn't add @param animatedValue to the
-     * deps array, to avoid the unnecessary loop.
-     * We can only check if the prop is passed initially,
-     * and we do early return.
-     */
-  }, [fade, scale, indeterminate, timer, progress]);
+  }, [fade, scale, indeterminate, timer, progress, isWeb]);
   const stopAnimation = React.useCallback(() => {
     // Stop indeterminate animation
     if (indeterminateAnimation.current) {
@@ -137,14 +142,17 @@ const ProgressBar = _ref => {
     accessibilityValue: indeterminate ? {} : {
       min: 0,
       max: 100,
-      now: progress * 100
-    }
+      now: Math.round(progress * 100)
+    },
+    style: isWeb && styles.webContainer,
+    testID: testID
   }), /*#__PURE__*/React.createElement(Animated.View, {
     style: [styles.container, {
       backgroundColor: trackTintColor,
       opacity: fade
     }, style]
   }, width ? /*#__PURE__*/React.createElement(Animated.View, {
+    testID: `${testID}-fill`,
     style: [styles.progressBar, {
       width,
       backgroundColor: tintColor,
@@ -166,7 +174,7 @@ const ProgressBar = _ref => {
           outputRange: [0.0001, 1]
         })
       }]
-    }]
+    }, fillStyle]
   }) : null));
 };
 const styles = StyleSheet.create({
@@ -174,9 +182,13 @@ const styles = StyleSheet.create({
     height: 4,
     overflow: 'hidden'
   },
+  webContainer: {
+    width: '100%',
+    height: '100%'
+  },
   progressBar: {
     flex: 1
   }
 });
-export default withInternalTheme(ProgressBar);
+export default ProgressBar;
 //# sourceMappingURL=ProgressBar.js.map

@@ -17,22 +17,24 @@ function CadastrarImovel() {
   const enviar = () => {
     const dados = {
       nomeImovel: nome,
-      cepImovel: cep,
-      ruaImovel: rua,
-      bairroImovel: bairro,
-      cidadeImovel: cidade,
-      estadoImovel: estado,
+      endereco: {
+        cepImovel: cep,
+        ruaImovel: rua,
+        bairroImovel: bairro,
+        cidadeImovel: cidade,
+        estadoImovel: estado,
+      },
       valorAluguelImovel: Number(aluguel),
       valor_imovel: Number(valor),
       statusImovel: status,
     };
     if (dados.nomeImovel === "") {
       alert("Nome do imovel não pode ser vazio")
-    } else if (dados.cepImovel === "") {
+    } else if (dados.endereco.cepImovel === "") {
       alert("CEP do imovel não pode ser vazio")
-    } else if (dados.ruaImovel === "") {
+    } else if (dados.endereco.ruaImovel === "") {
       alert("Rua do imovel não pode ser vazio")
-    } else if (dados.estadoImovel === "") {
+    } else if (dados.endereco.estadoImovel === "") {
       alert("Estado do imovel não pode ser vazio")
     } else if (dados.statusImovel === "") {
       alert("Status do imovel não pode ser vazio")

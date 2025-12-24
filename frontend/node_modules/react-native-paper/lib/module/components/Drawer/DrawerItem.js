@@ -1,18 +1,12 @@
 import * as React from 'react';
 import { StyleSheet, View } from 'react-native';
 import color from 'color';
-import { withInternalTheme } from '../../core/theming';
+import { useInternalTheme } from '../../core/theming';
 import Icon from '../Icon';
 import TouchableRipple from '../TouchableRipple/TouchableRipple';
 import Text from '../Typography/Text';
 /**
  * A component used to show an action item with an icon and a label in a navigation drawer.
- *
- * <div class="screenshots">
- *   <figure>
- *     <img class="medium" src="screenshots/drawer-item.png" />
- *   </figure>
- * </div>
  *
  * ## Usage
  * ```js
@@ -30,30 +24,37 @@ import Text from '../Typography/Text';
  * export default MyComponent;
  * ```
  */
-const DrawerItem = _ref => {
-  let {
-    icon,
-    label,
-    active,
-    theme,
-    style,
-    onPress,
-    accessibilityLabel,
-    right,
-    ...rest
-  } = _ref;
+const DrawerItem = ({
+  icon,
+  label,
+  active,
+  disabled,
+  theme: themeOverrides,
+  rippleColor: customRippleColor,
+  style,
+  onPress,
+  background,
+  accessibilityLabel,
+  right,
+  labelMaxFontSizeMultiplier,
+  hitSlop,
+  ...rest
+}) => {
+  const theme = useInternalTheme(themeOverrides);
   const {
     roundness,
     isV3
   } = theme;
-  const backgroundColor = active ? isV3 ? theme.colors.secondaryContainer : color(theme.colors.primary).alpha(0.12).rgb().string() : 'transparent';
+  const backgroundColor = active ? isV3 ? theme.colors.secondaryContainer : color(theme.colors.primary).alpha(0.12).rgb().string() : undefined;
   const contentColor = active ? isV3 ? theme.colors.onSecondaryContainer : theme.colors.primary : isV3 ? theme.colors.onSurfaceVariant : color(theme.colors.text).alpha(0.68).rgb().string();
   const labelMargin = icon ? isV3 ? 12 : 32 : 0;
   const borderRadius = (isV3 ? 7 : 1) * roundness;
-  const underlayColor = isV3 ? color(backgroundColor).mix(color(theme.colors.onSecondaryContainer), 0.16).rgb().toString() : undefined;
+  const rippleColor = isV3 ? color(contentColor).alpha(0.12).rgb().string() : undefined;
   const font = isV3 ? theme.fonts.labelLarge : theme.fonts.medium;
   return /*#__PURE__*/React.createElement(View, rest, /*#__PURE__*/React.createElement(TouchableRipple, {
     borderless: true,
+    disabled: disabled,
+    background: background,
     onPress: onPress,
     style: [styles.container, {
       backgroundColor,
@@ -64,7 +65,9 @@ const DrawerItem = _ref => {
       selected: active
     },
     accessibilityLabel: accessibilityLabel,
-    underlayColor: underlayColor
+    rippleColor: customRippleColor || rippleColor,
+    theme: theme,
+    hitSlop: hitSlop
   }, /*#__PURE__*/React.createElement(View, {
     style: [styles.wrapper, isV3 && styles.v3Wrapper]
   }, /*#__PURE__*/React.createElement(View, {
@@ -81,7 +84,8 @@ const DrawerItem = _ref => {
       color: contentColor,
       marginLeft: labelMargin,
       ...font
-    }]
+    }],
+    maxFontSizeMultiplier: labelMaxFontSizeMultiplier
   }, label)), right === null || right === void 0 ? void 0 : right({
     color: contentColor
   }))));
@@ -118,5 +122,5 @@ const styles = StyleSheet.create({
     marginRight: 32
   }
 });
-export default withInternalTheme(DrawerItem);
+export default DrawerItem;
 //# sourceMappingURL=DrawerItem.js.map

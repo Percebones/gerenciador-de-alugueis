@@ -42,11 +42,11 @@ function UpdateImovel({ idImovel }: Props) {
     if (!dados) return;
 
     setNome(dados.nomeImovel);
-    setCep(dados.cepImovel);
-    setRua(dados.ruaImovel);
-    setBairro(dados.bairroImovel);
-    setCidade(dados.cidadeImovel);
-    setEstado(dados.estadoImovel);
+    setCep(dados.endereco.cepImovel);
+    setRua(dados.endereco.ruaImovel);
+    setBairro(dados.endereco.bairroImovel);
+    setCidade(dados.endereco.cidadeImovel);
+    setEstado(dados.endereco.estadoImovel);
     setStatus(dados.statusImovel);
     setAluguel(String(dados.valorAluguelImovel));
     setValor(String(dados.valor_imovel));
@@ -56,11 +56,13 @@ function UpdateImovel({ idImovel }: Props) {
     const carga = {
       idImovel: idImovel,
       nomeImovel: nome,
-      cepImovel: cep,
-      ruaImovel: rua,
-      bairroImovel: bairro,
-      cidadeImovel: cidade,
-      estadoImovel: estado,
+      endereco: {
+        cepImovel: cep,
+        ruaImovel: rua,
+        bairroImovel: bairro,
+        cidadeImovel: cidade,
+        estadoImovel: estado,
+      },
       statusImovel: status,
       valorAluguelImovel: Number(aluguel),
       valor_imovel: Number(valor),

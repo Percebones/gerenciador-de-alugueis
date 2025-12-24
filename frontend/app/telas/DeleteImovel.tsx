@@ -38,11 +38,11 @@ function DeletarImovel({ idImovel }: Props) {
     useEffect(() => {
         if (!dados) return;
         setNome(dados.nomeImovel);
-        setCep(dados.cepImovel);
-        setRua(dados.ruaImovel);
-        setBairro(dados.bairroImovel);
-        setCidade(dados.cidadeImovel);
-        setEstado(dados.estadoImovel);
+        setCep(dados.endereco.cepImovel);
+        setRua(dados.endereco.ruaImovel);
+        setBairro(dados.endereco.bairroImovel);
+        setCidade(dados.endereco.cidadeImovel);
+        setEstado(dados.endereco.estadoImovel);
         setStatus(dados.statusImovel);
         setAluguel(String(dados.valorAluguelImovel));
         setValor(String(dados.valor_imovel));

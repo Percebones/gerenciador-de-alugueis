@@ -13,7 +13,7 @@ export default function Lista() {
   const [openEdit, setEdit] = useState(false);
   const [idImovel, setId] = useState<number | null>(null);
   const [totAluguel, setTotA] = useState<number>(0);
-  let a = 0
+  let TotAluguel = 0
   useEffect(() => {
     api.get("/api/imoveis/busca")
       .then((res) => {
@@ -28,14 +28,14 @@ export default function Lista() {
 
   useEffect(() => {
     if (dados.length > 0) {
-      let a = 0;
+      let TotAluguel = 0;
       for (let index = 0; index < dados.length; index++) {
         if (dados[index].statusImovel === "Alugado") {
-          a += Number(dados[index].valorAluguelImovel);
+          TotAluguel += Number(dados[index].valorAluguelImovel);
         }
       }
-      setTotA(a);
-      console.log("Total de aluguel:", a);
+      setTotA(TotAluguel);
+      console.log("Total de aluguel:", TotAluguel);
     }
   }, [dados]);
 
@@ -46,9 +46,6 @@ export default function Lista() {
       </View>
     );
   }
-
-
-
 
   return (
     <ScrollView style={{padding: 20}}>
@@ -97,11 +94,11 @@ export default function Lista() {
                 <DataTable.Cell style={{ flex: 8 }}>
                   <Text style={{ fontWeight: '600' }}>{item.nomeImovel}</Text>
                 </DataTable.Cell>
-                <DataTable.Cell style={{ flex: 4 }}>{item.cepImovel}</DataTable.Cell>
-                <DataTable.Cell style={{ flex: 8 }}>{item.ruaImovel}</DataTable.Cell>
-                <DataTable.Cell style={{ flex: 4 }}>{item.bairroImovel}</DataTable.Cell>
-                <DataTable.Cell style={{ flex: 4 }}>{item.cidadeImovel}</DataTable.Cell>
-                <DataTable.Cell style={{ flex: 3.4 }}>{item.estadoImovel}</DataTable.Cell>
+                <DataTable.Cell style={{ flex: 4 }}>{item.endereco.cepImovel}</DataTable.Cell>
+                <DataTable.Cell style={{ flex: 8 }}>{item.endereco.ruaImovel}</DataTable.Cell>
+                <DataTable.Cell style={{ flex: 4 }}>{item.endereco.bairroImovel}</DataTable.Cell>
+                <DataTable.Cell style={{ flex: 4 }}>{item.endereco.cidadeImovel}</DataTable.Cell>
+                <DataTable.Cell style={{ flex: 3.4 }}>{item.endereco.estadoImovel}</DataTable.Cell>
                 <DataTable.Cell numeric style={{ flex: 3 }}>
                   <Text style={{ fontWeight: 'bold', color: '#0066cc' }}>
                     R$ {Number(item.valorAluguelImovel).toLocaleString('pt-BR')}

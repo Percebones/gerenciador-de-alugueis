@@ -53,13 +53,18 @@ export default function Impostos() {
             <ScrollView style={{ alignSelf: 'center' }}>
                 <View style={{ padding: 20, width: 1300 }}>
                     <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>
-                        |Calculos de Impostos|
+                        |Despesas|
                     </Text>
 
                     <DataTable style={{ backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden' }}>
                             <DataTable.Row>
                                 <DataTable.Cell style={{ flex: 1 }}>
-                                    <Text style={{fontWeight: "bold", fontSize: 25}}>Imposto de renda a ser pago sobre o valor de R${totAluguel.toLocaleString('pt-BR')}:  R${Math.round((totAluguel - 1000) * 0.275)}</Text>
+                                    <Text style={{fontWeight: "bold", fontSize: 25}}>IR: sobre R${totAluguel.toLocaleString('pt-BR')}:  R${totAluguel > 0? Math.round((totAluguel - 1000) * 0.275): 0}</Text>
+                                </DataTable.Cell>
+                            </DataTable.Row>
+                            <DataTable.Row>
+                                <DataTable.Cell style={{ flex: 1 }}>
+                                    <Text style={{fontWeight: "bold", fontSize: 25}}>IPTU: </Text>
                                 </DataTable.Cell>
                             </DataTable.Row>
                        

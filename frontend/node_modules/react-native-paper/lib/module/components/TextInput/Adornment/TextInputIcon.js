@@ -1,6 +1,7 @@
-function _extends() { _extends = Object.assign ? Object.assign.bind() : function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; }; return _extends.apply(this, arguments); }
+function _extends() { return _extends = Object.assign ? Object.assign.bind() : function (n) { for (var e = 1; e < arguments.length; e++) { var t = arguments[e]; for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]); } return n; }, _extends.apply(null, arguments); }
 import React from 'react';
 import { StyleSheet, View } from 'react-native';
+import { getIconColor } from './utils';
 import { useInternalTheme } from '../../../core/theming';
 import IconButton from '../../IconButton/IconButton';
 import { ICON_SIZE } from '../constants';
@@ -11,18 +12,19 @@ const StyleContext = /*#__PURE__*/React.createContext({
   forceFocus: () => {},
   testID: ''
 });
-const IconAdornment = _ref => {
-  let {
-    icon,
-    topPosition,
-    side,
-    isTextInputFocused,
-    forceFocus,
-    testID
-  } = _ref;
+const IconAdornment = ({
+  icon,
+  topPosition,
+  side,
+  isTextInputFocused,
+  forceFocus,
+  testID,
+  theme: themeOverrides,
+  disabled
+}) => {
   const {
     isV3
-  } = useInternalTheme();
+  } = useInternalTheme(themeOverrides);
   const {
     ICON_OFFSET
   } = getConstants(isV3);
@@ -34,7 +36,8 @@ const IconAdornment = _ref => {
     style,
     isTextInputFocused,
     forceFocus,
-    testID
+    testID,
+    disabled
   };
   return /*#__PURE__*/React.createElement(StyleContext.Provider, {
     value: contextState
@@ -43,12 +46,6 @@ const IconAdornment = _ref => {
 
 /**
  * A component to render a leading / trailing icon in the TextInput
- *
- * <div class="screenshots">
- *   <figure>
- *     <img class="small" src="screenshots/textinput-flat.icon.png" />
- *   </figure>
- * </div>
  *
  * ## Usage
  * ```js
@@ -71,36 +68,35 @@ const IconAdornment = _ref => {
  * ```
  */
 
-const TextInputIcon = _ref2 => {
-  let {
-    icon,
-    onPress,
-    forceTextInputFocus,
-    color,
-    ...rest
-  } = _ref2;
+const TextInputIcon = ({
+  icon,
+  onPress,
+  forceTextInputFocus = true,
+  color: customColor,
+  theme: themeOverrides,
+  rippleColor,
+  ...rest
+}) => {
   const {
     style,
     isTextInputFocused,
     forceFocus,
-    testID
+    testID,
+    disabled
   } = React.useContext(StyleContext);
   const onPressWithFocusControl = React.useCallback(e => {
     if (forceTextInputFocus && !isTextInputFocused) {
       forceFocus();
     }
-    onPress === null || onPress === void 0 ? void 0 : onPress(e);
+    onPress === null || onPress === void 0 || onPress(e);
   }, [forceTextInputFocus, forceFocus, isTextInputFocused, onPress]);
-  const theme = useInternalTheme();
-  let iconColor = color;
-  if (theme.isV3) {
-    if (rest.disabled) {
-      iconColor = theme.colors.onSurface;
-    }
-    iconColor = theme.colors.onSurfaceVariant;
-  } else {
-    iconColor = theme.colors.text;
-  }
+  const theme = useInternalTheme(themeOverrides);
+  const iconColor = getIconColor({
+    theme,
+    disabled,
+    isTextInputFocused,
+    customColor
+  });
   return /*#__PURE__*/React.createElement(View, {
     style: [styles.container, style]
   }, /*#__PURE__*/React.createElement(IconButton, _extends({
@@ -108,14 +104,13 @@ const TextInputIcon = _ref2 => {
     style: styles.iconButton,
     size: ICON_SIZE,
     onPress: onPressWithFocusControl,
-    iconColor: typeof color === 'function' ? color(isTextInputFocused) : iconColor,
-    testID: testID
+    iconColor: iconColor,
+    testID: testID,
+    theme: themeOverrides,
+    rippleColor: rippleColor
   }, rest)));
 };
 TextInputIcon.displayName = 'TextInput.Icon';
-TextInputIcon.defaultProps = {
-  forceTextInputFocus: true
-};
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
