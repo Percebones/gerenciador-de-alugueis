@@ -1,4 +1,5 @@
 Projeto para uso pessoal de um gerenciado de imoveis alugados.
+Desenvolvido com backend Java Spring Boot 4.0 e front end React-Native(EXPO)
 
 Imagens do Painel administrativo
 
