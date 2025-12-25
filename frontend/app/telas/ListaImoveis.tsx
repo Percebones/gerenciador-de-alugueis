@@ -60,16 +60,18 @@ export default function Lista() {
       {openDel && (
         <ModalDelImovel idImovel={idImovel} onClose={() => setDel(false)} />
       )}
-
+<View>
+  
+</View>
       <ScrollView style={{ alignSelf: 'center' }}>
         <View style={{ padding: 20, width: 1300 }}>
           <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>
             |Lista de Imóveis | Soma dos Alugueis: R${totAluguel.toLocaleString('pt-BR')}|
           </Text>
-
-          <DataTable style={{ backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden' }}>
+          <ScrollView>
+          <DataTable style={{ backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden', borderWidth: 1 }}>
             <DataTable.Header style={{ backgroundColor: '#f0f0f0', height: 56 }}>
-              <DataTable.Title style={{ flex: 8 }}>NOME</DataTable.Title>
+              <DataTable.Title style={{ flex: 8 }}>IMOVEL</DataTable.Title>
               <DataTable.Title style={{ flex: 4 }}>CEP</DataTable.Title>
               <DataTable.Title style={{ flex: 8 }}>RUA</DataTable.Title>
               <DataTable.Title style={{ flex: 4 }}>BAIRRO</DataTable.Title>
@@ -132,6 +134,7 @@ export default function Lista() {
               </DataTable.Row>
             ))}
           </DataTable>
+          </ScrollView>
         </View>
       </ScrollView>
     </ScrollView>

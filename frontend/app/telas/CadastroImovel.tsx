@@ -27,6 +27,10 @@ function CadastrarImovel() {
       valorAluguelImovel: Number(aluguel),
       valor_imovel: Number(valor),
       statusImovel: status,
+      despesa: {
+          iptuImovel: 0
+      }
+
     };
     if (dados.nomeImovel === "") {
       alert("Nome do imovel não pode ser vazio")

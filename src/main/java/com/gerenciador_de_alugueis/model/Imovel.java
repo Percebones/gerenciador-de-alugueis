@@ -1,7 +1,6 @@
 package com.gerenciador_de_alugueis.model;
 
 import com.gerenciador_de_alugueis.dto.ImovelDto;
-import com.gerenciador_de_alugueis.enumerators.Estados;
 import com.gerenciador_de_alugueis.enumerators.Status;
 import jakarta.persistence.*;
 
@@ -36,6 +35,11 @@ public class Imovel {
     @JoinColumn(name = "id_despesa")
     private Despesa despesa;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "id_pagamento")
+    private Pagamento pagamento;
+
+
     public Imovel() {
     }
 
@@ -45,6 +49,7 @@ public class Imovel {
         this.valorAluguelImovel = imovelDto.getValorAluguelImovel();
         this.valor_imovel = imovelDto.getValor_imovel();
         this.endereco = imovelDto.getEndereco();
+        this.despesa = imovelDto.getDespesa();
     }
 
     public int getIdImovel() {
@@ -97,6 +102,14 @@ public class Imovel {
 
     public void setDespesa(Despesa despesa) {
         this.despesa = despesa;
+    }
+
+    public Pagamento getPagamento() {
+        return pagamento;
+    }
+
+    public void setPagamento(Pagamento pagamento) {
+        this.pagamento = pagamento;
     }
 }
 

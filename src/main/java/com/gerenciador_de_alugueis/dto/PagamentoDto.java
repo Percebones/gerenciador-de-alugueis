@@ -2,7 +2,6 @@ package com.gerenciador_de_alugueis.dto;
 
 import com.gerenciador_de_alugueis.model.Imovel;
 
-
 import java.math.BigInteger;
 
 public class PagamentoDto {

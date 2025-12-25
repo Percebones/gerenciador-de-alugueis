@@ -7,6 +7,10 @@ export interface EnderecoDto {
   estadoImovel: string;
 }
 
+export interface DespesaDto{
+  iptuImovel: bigint;
+}
+
 export interface ImovelDto {
   idImovel: number;
   nomeImovel: string;
@@ -14,6 +18,7 @@ export interface ImovelDto {
   statusImovel: string;
   valorAluguelImovel: bigint;
   valor_imovel: bigint;
+  despesa:DespesaDto;
 }
 
 // Resposta padrão da API (quando você retornar ResponseEntity<ApiResponse<...>> no backend)

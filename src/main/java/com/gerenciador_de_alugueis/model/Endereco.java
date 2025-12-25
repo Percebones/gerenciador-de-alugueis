@@ -3,7 +3,6 @@ package com.gerenciador_de_alugueis.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gerenciador_de_alugueis.dto.EnderecoDto;
 import com.gerenciador_de_alugueis.enumerators.Estados;
-import com.gerenciador_de_alugueis.repo.EnderecoRpo;
 import jakarta.persistence.*;
 
 @Entity

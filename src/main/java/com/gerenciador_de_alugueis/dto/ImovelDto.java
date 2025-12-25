@@ -2,7 +2,9 @@ package com.gerenciador_de_alugueis.dto;
 
 import com.gerenciador_de_alugueis.enumerators.Estados;
 import com.gerenciador_de_alugueis.enumerators.Status;
+import com.gerenciador_de_alugueis.model.Despesa;
 import com.gerenciador_de_alugueis.model.Endereco;
+import com.gerenciador_de_alugueis.model.Pagamento;
 
 import java.math.BigInteger;
 
@@ -13,16 +15,20 @@ public class ImovelDto {
     private BigInteger valorAluguelImovel;
     private BigInteger valor_imovel;
     private Endereco endereco;
+    private Despesa despesa;
+
 
     public ImovelDto() {
     }
 
-    public ImovelDto(String nomeImovel, String cepImovel, String ruaImovel, String bairroImovel, String cidadeImovel, Estados estadoImovel, Status statusImovel, BigInteger valorAluguelImovel, BigInteger valor_imovel,Endereco endereco) {
+    public ImovelDto(String nomeImovel, String cepImovel, String ruaImovel, String bairroImovel, String cidadeImovel, Estados estadoImovel, Status statusImovel, BigInteger valorAluguelImovel, BigInteger valor_imovel,
+                     Endereco endereco, Despesa despesa) {
         this.nomeImovel = nomeImovel;
         this.statusImovel = statusImovel;
         this.valorAluguelImovel = valorAluguelImovel;
         this.valor_imovel = valor_imovel;
         this.endereco = endereco;
+        this.despesa = despesa;
     }
 
     public String getNomeImovel() {
@@ -68,4 +74,14 @@ public class ImovelDto {
     public void setEndereco(Endereco endereco) {
         this.endereco = endereco;
     }
+
+    public Despesa getDespesa() {
+        return despesa;
+    }
+
+    public void setDespesa(Despesa despesa) {
+        this.despesa = despesa;
+    }
+
+
 }

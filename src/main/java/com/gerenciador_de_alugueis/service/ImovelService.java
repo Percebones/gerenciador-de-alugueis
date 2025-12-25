@@ -1,8 +1,8 @@
 package com.gerenciador_de_alugueis.service;
 
 import com.gerenciador_de_alugueis.dto.ImovelDto;
-import com.gerenciador_de_alugueis.model.Endereco;
 import com.gerenciador_de_alugueis.model.Imovel;
+import com.gerenciador_de_alugueis.repo.DespesaRpo;
 import com.gerenciador_de_alugueis.repo.EnderecoRpo;
 import com.gerenciador_de_alugueis.repo.ImovelRpo;
 import org.springframework.stereotype.Service;
@@ -13,10 +13,12 @@ public class ImovelService {
 
     private final ImovelRpo imovelRpo;
     private final EnderecoRpo enderecoRpo;
+    private final DespesaRpo despesaRpo;
 
-    public ImovelService(ImovelRpo imovelRpo, EnderecoRpo enderecoRpo) {
+    public ImovelService(ImovelRpo imovelRpo, EnderecoRpo enderecoRpo, DespesaRpo despesaRpo) {
         this.imovelRpo = imovelRpo;
         this.enderecoRpo = enderecoRpo;
+        this.despesaRpo = despesaRpo;
     }
 
     public Iterable<Imovel> getAllImoveis() {
@@ -36,8 +38,8 @@ public class ImovelService {
         }
         try {
             enderecoRpo.save(imovel.getEndereco());
+            despesaRpo.save(imovel.getDespesa());
             return imovelRpo.save(imovel);
-
         } catch (Exception e) {
             e.printStackTrace();
             throw new Exception(" Tipo de dado invalido ou fora de ordem");

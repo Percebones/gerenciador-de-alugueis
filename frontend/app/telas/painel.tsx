@@ -5,18 +5,27 @@ import api from "../services/api";
 import { ImovelDto } from "../types/types";
 import { ModalCadImovel, ModalDelImovel, ModalEditImovel } from "../components/modals"
 import Lista from "./ListaImoveis";
-import Impostos from "./Impostos";
+import Despesas from "./Despesas";
+import Pagamentos from "./pagamentos";
 
 export default function Painel() {
 
     return (
         <ScrollView>
-           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <Lista/>
-           </ScrollView>
-           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <Impostos/>
-           </ScrollView>
+            <View>
+            <ScrollView>
+                <Lista />
+            </ScrollView>
+            </View>
+            <View>
+            <ScrollView>
+                <Pagamentos />
+            </ScrollView>
+            </View>
+            <ScrollView >
+                <Despesas />
+            </ScrollView>
         </ScrollView>
+
     );
 }

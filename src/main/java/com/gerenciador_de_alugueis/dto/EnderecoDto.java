@@ -2,7 +2,6 @@ package com.gerenciador_de_alugueis.dto;
 
 import com.gerenciador_de_alugueis.enumerators.Estados;
 import com.gerenciador_de_alugueis.model.Imovel;
-import jakarta.persistence.*;
 
 public class EnderecoDto {
 

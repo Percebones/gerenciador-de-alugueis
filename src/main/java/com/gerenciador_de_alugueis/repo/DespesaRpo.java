@@ -4,5 +4,5 @@ import com.gerenciador_de_alugueis.model.Despesa;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DespesaRpo extends GenericRpo<Despesa>{
+public interface DespesaRpo extends GenericRpo<Despesa> {
 }

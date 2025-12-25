@@ -1,5 +1,6 @@
 package com.gerenciador_de_alugueis.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.gerenciador_de_alugueis.dto.PagamentoDto;
 import jakarta.persistence.*;
 
@@ -14,7 +15,7 @@ public class Pagamento {
     private int idPagamento;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_imovel", nullable = false, referencedColumnName = "id_imovel")
+    @JsonIgnore
     private Imovel imovel;
 
     @Column(name = "mes_pagamento", nullable = false)
