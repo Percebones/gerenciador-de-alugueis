@@ -1,7 +1,8 @@
 package com.gerenciador_de_alugueis.repo;
 
-import com.gerenciador_de_alugueis.model.Despesa;
 import org.springframework.stereotype.Repository;
+
+import com.gerenciador_de_alugueis.model.Despesa;
 
 @Repository
 public interface DespesaRpo extends GenericRpo<Despesa> {
