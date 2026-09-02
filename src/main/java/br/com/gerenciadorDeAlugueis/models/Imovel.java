@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import java.math.BigInteger;
 
 @Entity
-@Table(name = "imovel")
+@Table(name = "imoveis")
 public class Imovel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,11 +31,7 @@ public class Imovel {
     @JoinColumn(name = "id_endereco")
     private Endereco endereco;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_despesa")
-    private Despesa despesa;
-
-
+    
     public Imovel() {
     }
 
@@ -45,7 +41,6 @@ public class Imovel {
         this.valorAluguelImovel = imovelDto.getValorAluguelImovel();
         this.valor_imovel = imovelDto.getValor_imovel();
         this.endereco = imovelDto.getEndereco();
-        this.despesa = imovelDto.getDespesa();
     }
 
     public Long getIdImovel() {
@@ -92,13 +87,6 @@ public class Imovel {
         this.endereco = endereco;
     }
 
-    public Despesa getDespesa() {
-        return despesa;
-    }
-
-    public void setDespesa(Despesa despesa) {
-        this.despesa = despesa;
-    }
 
 }
 
