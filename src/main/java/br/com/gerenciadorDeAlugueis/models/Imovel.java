@@ -3,9 +3,13 @@ package br.com.gerenciadorDeAlugueis.models;
 import br.com.gerenciadorDeAlugueis.dto.ImovelDto;
 import br.com.gerenciadorDeAlugueis.enumerators.Status;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
 
+@Data
+@NoArgsConstructor
 @Entity
 @Table(name = "imoveis")
 public class Imovel {
@@ -31,9 +35,6 @@ public class Imovel {
     @JoinColumn(name = "id_endereco")
     private Endereco endereco;
 
-    
-    public Imovel() {
-    }
 
     public Imovel(ImovelDto imovelDto) {
         this.nomeImovel = imovelDto.getNomeImovel();
@@ -42,51 +43,6 @@ public class Imovel {
         this.valor_imovel = imovelDto.getValor_imovel();
         this.endereco = imovelDto.getEndereco();
     }
-
-    public Long getIdImovel() {
-        return idImovel;
-    }
-
-    public String getNomeImovel() {
-        return nomeImovel;
-    }
-
-    public void setNomeImovel(String nomeImovel) {
-        this.nomeImovel = nomeImovel;
-    }
-
-    public Status getStatusImovel() {
-        return statusImovel;
-    }
-
-    public void setStatusImovel(Status statusImovel) {
-        this.statusImovel = statusImovel;
-    }
-
-    public BigInteger getValorAluguelImovel() {
-        return valorAluguelImovel;
-    }
-
-    public void setValorAluguelImovel(BigInteger valorAluguelImovel) {
-        this.valorAluguelImovel = valorAluguelImovel;
-    }
-
-    public BigInteger getValor_imovel() {
-        return valor_imovel;
-    }
-
-    public void setValor_imovel(BigInteger valor_imovel) {
-        this.valor_imovel = valor_imovel;
-    }
-
-    public Endereco getEndereco() {
-        return endereco;
-    }
-
-    public void setEndereco(Endereco endereco) {
-        this.endereco = endereco;
-    }
-
 
 }
 

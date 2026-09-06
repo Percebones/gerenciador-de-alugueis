@@ -11,7 +11,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+
+@Data
+@NoArgsConstructor
 @Entity
 @Table(name = "despesas")
 public class Despesa {
@@ -31,40 +36,10 @@ public class Despesa {
     @Column(name = "condominio_imovel")
     private BigInteger condominio;
 
-    public Despesa() {
-    }
-
     public Despesa(Imovel imovel, BigInteger iptuImovel, BigInteger condominio) {
         this.imovel = imovel;
         this.iptuImovel = iptuImovel;
         this.condominio = condominio;
     }
 
-    public Long getIdDespesa() {
-        return idDespesa;
-    }
-
-    public Imovel getImovel() {
-        return imovel;
-    }
-
-    public void setImovel(Imovel imovel) {
-        this.imovel = imovel;
-    }
-
-    public BigInteger getIptuImovel() {
-        return iptuImovel;
-    }
-
-    public void setIptuImovel(BigInteger iptuImovel) {
-        this.iptuImovel = iptuImovel;
-    }
-
-    public BigInteger getCondominio() {
-        return condominio;
-    }
-
-    public void setCondominio(BigInteger condominio) {
-        this.condominio = condominio;
-    }
 }

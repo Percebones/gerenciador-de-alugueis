@@ -3,6 +3,7 @@ package br.com.gerenciadorDeAlugueis.controllers;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,13 +17,18 @@ import br.com.gerenciadorDeAlugueis.models.Imovel;
 import br.com.gerenciadorDeAlugueis.service.ImovelService;
 
 @RestController
-@RequestMapping(path = "/api/imoveis")
+@RequestMapping(path = "/api/v1/imovel")
 public class ImovelController {
 
     private final ImovelService imovelService;
 
     ImovelController(ImovelService imovelService) {
         this.imovelService = imovelService;
+    }
+    
+    @GetMapping
+    public String respostaPadrao() {
+    	return "Endpoint de imóveis funcionando!";
     }
 
     @PostMapping(path = "/cria")
@@ -37,7 +43,7 @@ public class ImovelController {
     }
 
     @PostMapping(path = "/update")
-    public ResponseEntity<?> UpdateImovel(@RequestBody ImovelDto imovelDto) throws Exception {
+    public ResponseEntity<?> UpdateImovel(@RequestBody @NonNull ImovelDto imovelDto) throws Exception {
         try {
             imovelService.atualizarImovel(imovelDto);
             return new ResponseEntity<>("Imovel atualizado com sucesso", HttpStatus.CREATED);
@@ -67,6 +73,6 @@ public class ImovelController {
         Imovel imovel = imovelService.getImovelById(id);
         return new ResponseEntity<>(imovel, HttpStatus.OK);
     }
-
+    
 
 }
