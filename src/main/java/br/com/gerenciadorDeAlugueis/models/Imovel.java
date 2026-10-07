@@ -7,12 +7,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
 @Entity
 @Table(name = "imoveis")
 public class Imovel {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_imovel")
@@ -21,8 +24,8 @@ public class Imovel {
     @Column(name = "nome_imovel", nullable = false)
     private String nomeImovel;
 
-    @Column(name = "status_imovel", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "status_imovel", nullable = false)
     private Status statusImovel;
 
     @Column(name = "valor_aluguel")
@@ -32,17 +35,32 @@ public class Imovel {
     private BigInteger valor_imovel;
 
     @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "id_endereco")
+    @JoinColumn(
+            name = "id_endereco",
+            referencedColumnName = "id_endereco",
+            unique = true
+    )
     private Endereco endereco;
 
+    @OneToMany(
+            mappedBy = "imovel",
+            cascade = CascadeType.ALL
+    )
+    private List<Despesa> listaDespesas = new ArrayList<>();
 
     public Imovel(ImovelDto imovelDto) {
-        this.nomeImovel = imovelDto.getNomeImovel();
-        this.statusImovel = imovelDto.getStatusImovel();
-        this.valorAluguelImovel = imovelDto.getValorAluguelImovel();
-        this.valor_imovel = imovelDto.getValor_imovel();
-        this.endereco = imovelDto.getEndereco();
+        this.nomeImovel = imovelDto.nomeImovel();
+        this.statusImovel = imovelDto.statusImovel();
+        this.valorAluguelImovel = imovelDto.valorAluguelImovel();
+        this.valor_imovel = imovelDto.valor_imovel();
+
+        if (imovelDto.listaDespesas() != null) {
+            this.listaDespesas = imovelDto.listaDespesas();
+        }
+
+        if (imovelDto.endereco() != null) {
+            this.endereco = imovelDto.endereco();
+        }
     }
 
 }
-

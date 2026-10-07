@@ -1,20 +1,17 @@
 package br.com.gerenciadorDeAlugueis.controllers;
 
 
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.lang.NonNull;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
 import br.com.gerenciadorDeAlugueis.dto.ImovelDto;
 import br.com.gerenciadorDeAlugueis.models.Imovel;
 import br.com.gerenciadorDeAlugueis.service.ImovelService;
+import com.google.gson.Gson;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/v1/imovel")
@@ -22,20 +19,31 @@ public class ImovelController {
 
     private final ImovelService imovelService;
 
+    @Autowired
+    private final Gson gson = new Gson();
+
     ImovelController(ImovelService imovelService) {
         this.imovelService = imovelService;
     }
-    
+
     @GetMapping
     public String respostaPadrao() {
-    	return "Endpoint de imóveis funcionando!";
+        return "Endpoint de imóveis funcionando!";
     }
 
     @PostMapping(path = "/cria")
-    public ResponseEntity<?> CadImovel(@RequestBody ImovelDto imovelDto) throws Exception {
+    public ResponseEntity<String> CadImovel(@RequestBody ImovelDto imovelDto) throws Exception {
         try {
-            Imovel imovel = new Imovel(imovelDto);
-            imovelService.cadastroImovel(imovel);
+            Imovel imovel = new Imovel();
+            imovel.setIdImovel(imovelDto.idImovel());
+            imovel.setNomeImovel(imovelDto.nomeImovel());
+            imovel.setValorAluguelImovel(imovelDto.valorAluguelImovel());
+            imovel.setStatusImovel(imovelDto.statusImovel());
+            imovel.setValor_imovel(imovelDto.valor_imovel());
+            imovel.setEndereco(imovelDto.endereco());
+            imovel.setListaDespesas(imovelDto.listaDespesas());
+
+            imovelService.save(imovel);
             return new ResponseEntity<>("Imovel cadastrado com sucesso", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -45,7 +53,15 @@ public class ImovelController {
     @PostMapping(path = "/update")
     public ResponseEntity<?> UpdateImovel(@RequestBody @NonNull ImovelDto imovelDto) throws Exception {
         try {
-            imovelService.atualizarImovel(imovelDto);
+            Imovel imovel = new Imovel();
+            imovel.setIdImovel(imovelDto.idImovel());
+            imovel.setNomeImovel(imovelDto.nomeImovel());
+            imovel.setValorAluguelImovel(imovelDto.valorAluguelImovel());
+            imovel.setStatusImovel(imovelDto.statusImovel());
+            imovel.setValor_imovel(imovelDto.valor_imovel());
+            imovel.setEndereco(imovelDto.endereco());
+            imovel.setListaDespesas(imovelDto.listaDespesas());
+            imovelService.save(imovel);
             return new ResponseEntity<>("Imovel atualizado com sucesso", HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>("Erro ao atualizar Imovel" + e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -55,7 +71,7 @@ public class ImovelController {
     @DeleteMapping("/del/{id}")
     public ResponseEntity<Void> deletarImovel(@PathVariable Long id) {
         try {
-            imovelService.deletarPorId(id);
+            imovelService.deleteById(id);
             return ResponseEntity.noContent().build(); // 204
         } catch (Exception e) {
             return ResponseEntity.badRequest().build();
@@ -63,16 +79,16 @@ public class ImovelController {
     }
 
     @GetMapping(path = "/busca")
-    public ResponseEntity<Iterable<Imovel>> getAllImoveis() {
-        Iterable<Imovel> imoveis = imovelService.getAllImoveis();
-        return new ResponseEntity<>(imoveis, HttpStatus.OK);
+    public ResponseEntity<String> getAllImoveis() {
+        List<Imovel> imoveis = imovelService.findAll();
+        return new ResponseEntity<>(gson.toJson(imoveis), HttpStatus.OK);
     }
 
     @GetMapping(path = "/porID/{id}")
-    public ResponseEntity<Imovel> getImoveisById(@PathVariable int id) {
-        Imovel imovel = imovelService.getImovelById(id);
-        return new ResponseEntity<>(imovel, HttpStatus.OK);
+    public ResponseEntity<String> getImoveisById(@PathVariable Long id) {
+        Imovel imovel = imovelService.getById(id);
+        return new ResponseEntity<>(gson.toJson(imovel), HttpStatus.OK);
     }
-    
+
 
 }
