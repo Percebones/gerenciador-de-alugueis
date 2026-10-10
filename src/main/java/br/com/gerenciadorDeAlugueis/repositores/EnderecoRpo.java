@@ -1,8 +1,10 @@
 package br.com.gerenciadorDeAlugueis.repositores;
 
 import br.com.gerenciadorDeAlugueis.models.Endereco;
+import org.springframework.stereotype.Repository;
 
-public interface EnderecoRpo extends GenericRpo<Endereco> {
+@Repository
+public interface EnderecoRPO extends GenericRPO<Endereco> {
 
     boolean existsByCepImovel(String cep);
 

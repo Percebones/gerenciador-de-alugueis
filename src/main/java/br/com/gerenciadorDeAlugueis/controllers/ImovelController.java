@@ -1,17 +1,17 @@
 package br.com.gerenciadorDeAlugueis.controllers;
 
 
-import br.com.gerenciadorDeAlugueis.dto.ImovelDto;
+import br.com.gerenciadorDeAlugueis.dto.ImovelDTO;
+import br.com.gerenciadorDeAlugueis.exceptions.GerenciadorException;
 import br.com.gerenciadorDeAlugueis.models.Imovel;
 import br.com.gerenciadorDeAlugueis.service.ImovelService;
-import com.google.gson.Gson;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/v1/imovel")
@@ -19,10 +19,7 @@ public class ImovelController {
 
     private final ImovelService imovelService;
 
-    @Autowired
-    private final Gson gson = new Gson();
-
-    ImovelController(ImovelService imovelService) {
+    public ImovelController(ImovelService imovelService) {
         this.imovelService = imovelService;
     }
 
@@ -31,11 +28,10 @@ public class ImovelController {
         return "Endpoint de imóveis funcionando!";
     }
 
-    @PostMapping(path = "/cria")
-    public ResponseEntity<String> CadImovel(@RequestBody ImovelDto imovelDto) throws Exception {
+    @PostMapping(path = "/cadastroImovel")
+    public ResponseEntity<String> CadImovel(@RequestBody ImovelDTO imovelDto) {
         try {
             Imovel imovel = new Imovel();
-            imovel.setIdImovel(imovelDto.idImovel());
             imovel.setNomeImovel(imovelDto.nomeImovel());
             imovel.setValorAluguelImovel(imovelDto.valorAluguelImovel());
             imovel.setStatusImovel(imovelDto.statusImovel());
@@ -45,13 +41,15 @@ public class ImovelController {
 
             imovelService.save(imovel);
             return new ResponseEntity<>("Imovel cadastrado com sucesso", HttpStatus.CREATED);
-        } catch (Exception e) {
+        } catch (GerenciadorException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @PostMapping(path = "/update")
-    public ResponseEntity<?> UpdateImovel(@RequestBody @NonNull ImovelDto imovelDto) throws Exception {
+    @PostMapping(path = "/updateImovel")
+    public ResponseEntity<String> UpdateImovel(@RequestBody @NonNull ImovelDTO imovelDto) {
         try {
             Imovel imovel = new Imovel();
             imovel.setIdImovel(imovelDto.idImovel());
@@ -63,32 +61,50 @@ public class ImovelController {
             imovel.setListaDespesas(imovelDto.listaDespesas());
             imovelService.save(imovel);
             return new ResponseEntity<>("Imovel atualizado com sucesso", HttpStatus.CREATED);
+        } catch (GerenciadorException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return new ResponseEntity<>("Erro ao atualizar Imovel" + e.getMessage(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("Erro inesperado ao atualizar Imovel" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @DeleteMapping("/del/{id}")
-    public ResponseEntity<Void> deletarImovel(@PathVariable Long id) {
+    @DeleteMapping("/deleteImovel/{id}")
+    public ResponseEntity<String> deletarImovel(@PathVariable Long id) {
         try {
             imovelService.deleteById(id);
-            return ResponseEntity.noContent().build(); // 204
+            return new ResponseEntity<>("Imovel excluido com sucesso", HttpStatus.OK);
+        } catch (GerenciadorException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         } catch (Exception e) {
-            return ResponseEntity.badRequest().build();
+            return new ResponseEntity<>("Erro inesperado ao deletar Imoveis" + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    @GetMapping(path = "/busca")
-    public ResponseEntity<String> getAllImoveis() {
-        List<Imovel> imoveis = imovelService.findAll();
-        return new ResponseEntity<>(gson.toJson(imoveis), HttpStatus.OK);
+    @GetMapping(path = "/buscaImovel")
+    public ResponseEntity<?> getAllImoveis() {
+        try {
+            List<Imovel> imoveis = imovelService.findAll();
+            if (imoveis.isEmpty()) throw new GerenciadorException("Nenhum imovel encontrado");
+
+            return new ResponseEntity<>(imoveis, HttpStatus.OK);
+        } catch (GerenciadorException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
     }
 
-    @GetMapping(path = "/porID/{id}")
-    public ResponseEntity<String> getImoveisById(@PathVariable Long id) {
-        Imovel imovel = imovelService.getById(id);
-        return new ResponseEntity<>(gson.toJson(imovel), HttpStatus.OK);
+    @GetMapping(path = "/buscaByIdImovel/{id}")
+    public ResponseEntity<?> getImoveisById(@PathVariable Long id) {
+        try {
+            Optional<Imovel> imovel = imovelService.findById(id);
+            return new ResponseEntity<>(imovel, HttpStatus.OK);
+        } catch (GerenciadorException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
-
 
 }

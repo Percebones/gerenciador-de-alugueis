@@ -1,6 +1,8 @@
 package br.com.gerenciadorDeAlugueis.repositores;
 
 import br.com.gerenciadorDeAlugueis.models.Pagamento;
+import org.springframework.stereotype.Repository;
 
-public interface PagamentoRpo extends GenericRpo<Pagamento> {
+@Repository
+public interface PagamentoRPO extends GenericRPO<Pagamento> {
 }

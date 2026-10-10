@@ -1,6 +1,6 @@
 package br.com.gerenciadorDeAlugueis.models;
 
-import br.com.gerenciadorDeAlugueis.dto.EnderecoDto;
+import br.com.gerenciadorDeAlugueis.dto.EnderecoDTO;
 import br.com.gerenciadorDeAlugueis.enumerators.Estados;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -8,12 +8,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
 @Table(name = "enderecos")
-public class Endereco {
+public class Endereco implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,11 +42,11 @@ public class Endereco {
     @Column(name = "estado_imovel", nullable = false)
     private Estados estadoImovel;
 
-    public Endereco(EnderecoDto enderecoDto) {
-        this.cepImovel = enderecoDto.getCepImovel();
-        this.ruaImovel = enderecoDto.getRuaImovel();
-        this.bairroImovel = enderecoDto.getBairroImovel();
-        this.cidadeImovel = enderecoDto.getCidadeImovel();
-        this.estadoImovel = enderecoDto.getEstadoImovel();
+    public Endereco(EnderecoDTO enderecoDto) {
+        this.cepImovel = enderecoDto.cepImovel();
+        this.ruaImovel = enderecoDto.ruaImovel();
+        this.bairroImovel = enderecoDto.bairroImovel();
+        this.cidadeImovel = enderecoDto.cidadeImovel();
+        this.estadoImovel = enderecoDto.estadoImovel();
     }
 }

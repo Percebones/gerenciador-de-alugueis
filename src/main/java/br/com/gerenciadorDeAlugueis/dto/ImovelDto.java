@@ -7,7 +7,7 @@ import br.com.gerenciadorDeAlugueis.models.Endereco;
 import java.math.BigInteger;
 import java.util.List;
 
-public record ImovelDto(
+public record ImovelDTO(
         Long idImovel,
         String nomeImovel,
         Status statusImovel,

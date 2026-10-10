@@ -1,14 +1,20 @@
 package br.com.gerenciadorDeAlugueis.repositores;
 
 import br.com.gerenciadorDeAlugueis.models.Imovel;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface ImovelRpo extends GenericRpo<Imovel> {
+@Repository
+public interface ImovelRPO extends GenericRPO<Imovel> {
 
-    boolean existsByNomeImovel(String nome);
+    @Override
+    @EntityGraph(attributePaths = {"endereco", "listaDespesas"})
+    List<Imovel> findAll();
 
-    Optional<Imovel> findAllByIdImovel(int id);
-
-    Imovel findByIdImovel(int id);
+    @Override
+    @EntityGraph(attributePaths = {"endereco", "listaDespesas"})
+    Optional<Imovel> findById(Long id);
 }

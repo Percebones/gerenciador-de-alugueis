@@ -1,11 +1,12 @@
 package br.com.gerenciadorDeAlugueis.models;
 
-import br.com.gerenciadorDeAlugueis.dto.PagamentoDto;
+import br.com.gerenciadorDeAlugueis.dto.PagamentoDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 @Getter
@@ -13,7 +14,7 @@ import java.math.BigInteger;
 @NoArgsConstructor
 @Entity
 @Table(name = "pagamentos")
-public class Pagamento {
+public class Pagamento implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,9 +31,9 @@ public class Pagamento {
     @Column(name = "valor_pagamento", nullable = false)
     private BigInteger valorPagamento;
 
-    public Pagamento(PagamentoDto pagamentoDto) {
-        this.imovel = pagamentoDto.getImovel();
-        this.mesPagamento = pagamentoDto.getMesPagamento();
-        this.valorPagamento = pagamentoDto.getValorPagamento();
+    public Pagamento(PagamentoDTO pagamentoDto) {
+        this.imovel = pagamentoDto.imovel();
+        this.mesPagamento = pagamentoDto.mesPagamento();
+        this.valorPagamento = pagamentoDto.valorPagamento();
     }
 }
