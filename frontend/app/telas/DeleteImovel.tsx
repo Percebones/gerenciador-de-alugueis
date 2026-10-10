@@ -25,7 +25,7 @@ function DeletarImovel({ idImovel }: Props) {
     useEffect(() => {
         if (!idImovel) return;
         setLoading(true);
-        api.get(`/api/imoveis/porID/${idImovel}`)
+        api.get(`/api/v1/imovel/porID/${idImovel}`)
             .then((res) => {
                 setDados(res.data);
             })

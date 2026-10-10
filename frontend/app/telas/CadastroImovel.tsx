@@ -1,111 +1,462 @@
-import { Picker } from '@react-native-picker/picker';
-import React, { useState } from 'react';
-import { Alert, Button, ScrollView, Text, TextInput } from 'react-native';
-import api from '../services/api';
+import { Picker } from "@react-native-picker/picker";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Button,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
-function CadastrarImovel() {
-  const [nome, setNome] = useState('');
-  const [cep, setCep] = useState('');
-  const [rua, setRua] = useState('');
-  const [bairro, setBairro] = useState('');
-  const [cidade, setCidade] = useState('');
-  const [estado, setEstado] = useState('Parana'); // Valor inicial
-  const [aluguel, setAluguel] = useState('');
-  const [valor, setValor] = useState('');
-  const [status, setStatus] = useState('Vago'); // Valor inicial
+import { gerenciadorService } from "../services/gerenciadorService";
+import { ImovelDto } from "../types/types";
 
-  const enviar = () => {
-    const dados = {
-      nomeImovel: nome,
-      endereco: {
-        cepImovel: cep,
-        ruaImovel: rua,
-        bairroImovel: bairro,
-        cidadeImovel: cidade,
-        estadoImovel: estado,
-      },
-      valorAluguelImovel: Number(aluguel),
-      valor_imovel: Number(valor),
-      statusImovel: status,
-      despesa: {
-          iptuImovel: 0
-      }
+interface CadastrarImovelProps {
+  onSuccess?: () => void;
+}
 
-    };
-    if (dados.nomeImovel === "") {
-      alert("Nome do imovel não pode ser vazio")
-    } else if (dados.endereco.cepImovel === "") {
-      alert("CEP do imovel não pode ser vazio")
-    } else if (dados.endereco.ruaImovel === "") {
-      alert("Rua do imovel não pode ser vazio")
-    } else if (dados.endereco.estadoImovel === "") {
-      alert("Estado do imovel não pode ser vazio")
-    } else if (dados.statusImovel === "") {
-      alert("Status do imovel não pode ser vazio")
-    } else {
-      api.post("/api/imoveis/cria", dados)
-        .then(() => {
-          Alert.alert("Sucesso", "Imóvel cadastrado!");
-          alert("Imovel cadastrado com Sucesso")
-          window.location.reload();
-        })
-        .catch((err) => {
-          console.log("ERRO API:", err.response?.data);
-          const mensagem = err.response?.data;
-          alert(mensagem);
-        });
+const formatarNumeroComoMoeda = (
+  valor: number
+): string => {
+  return valor.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+};
+
+const aplicarMascaraMoeda = (
+  texto: string
+): string => {
+  const somenteNumeros = texto.replace(/\D/g, "");
+
+  if (!somenteNumeros) {
+    return "";
+  }
+
+  const valorNumerico =
+    Number(somenteNumeros) / 100;
+
+  return formatarNumeroComoMoeda(valorNumerico);
+};
+
+const converterMoedaParaNumero = (
+  valorFormatado: string
+): number => {
+  const somenteNumeros =
+    valorFormatado.replace(/\D/g, "");
+
+  if (!somenteNumeros) {
+    return 0;
+  }
+
+  return Number(somenteNumeros) / 100;
+};
+
+export function CadastrarImovel({
+  onSuccess,
+}: CadastrarImovelProps) {
+  const [nome, setNome] = useState("");
+  const [cep, setCep] = useState("");
+  const [rua, setRua] = useState("");
+  const [bairro, setBairro] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("Parana");
+
+  const [aluguel, setAluguel] = useState("");
+  const [valorImovel, setValorImovel] =
+    useState("");
+
+  const [status, setStatus] = useState("Vago");
+  const [cadastrando, setCadastrando] =
+    useState(false);
+
+  const formularioEstaValido = (): boolean => {
+    if (!nome.trim()) {
+      Alert.alert(
+        "Campo obrigatório",
+        "Informe o nome do imóvel."
+      );
+
+      return false;
     }
 
+    if (!cep.trim()) {
+      Alert.alert(
+        "Campo obrigatório",
+        "Informe o CEP do imóvel."
+      );
+
+      return false;
+    }
+
+    if (cep.trim().length !== 8) {
+      Alert.alert(
+        "CEP inválido",
+        "O CEP deve possuir 8 números."
+      );
+
+      return false;
+    }
+
+    if (!rua.trim()) {
+      Alert.alert(
+        "Campo obrigatório",
+        "Informe a rua do imóvel."
+      );
+
+      return false;
+    }
+
+    if (!estado) {
+      Alert.alert(
+        "Campo obrigatório",
+        "Informe o estado do imóvel."
+      );
+
+      return false;
+    }
+
+    if (!status) {
+      Alert.alert(
+        "Campo obrigatório",
+        "Informe o status do imóvel."
+      );
+
+      return false;
+    }
+
+    if (!aluguel) {
+      Alert.alert(
+        "Campo obrigatório",
+        "Informe o valor do aluguel."
+      );
+
+      return false;
+    }
+
+    if (!valorImovel) {
+      Alert.alert(
+        "Campo obrigatório",
+        "Informe o valor do imóvel."
+      );
+
+      return false;
+    }
+
+    const aluguelConvertido =
+      converterMoedaParaNumero(aluguel);
+
+    const valorImovelConvertido =
+      converterMoedaParaNumero(valorImovel);
+
+    if (aluguelConvertido < 0) {
+      Alert.alert(
+        "Valor inválido",
+        "Informe um valor de aluguel válido."
+      );
+
+      return false;
+    }
+
+    if (valorImovelConvertido <= 0) {
+      Alert.alert(
+        "Valor inválido",
+        "Informe um valor de imóvel maior que zero."
+      );
+
+      return false;
+    }
+
+    return true;
+  };
+
+  const limparFormulario = (): void => {
+    setNome("");
+    setCep("");
+    setRua("");
+    setBairro("");
+    setCidade("");
+    setEstado("Parana");
+    setAluguel("");
+    setValorImovel("");
+    setStatus("Vago");
+  };
+
+  const enviar = async (): Promise<void> => {
+    if (!formularioEstaValido()) {
+      return;
+    }
+
+    const novoImovel = {
+      nomeImovel: nome.trim(),
+
+      endereco: {
+        cepImovel: cep.trim(),
+        ruaImovel: rua.trim(),
+        bairroImovel: bairro.trim(),
+        cidadeImovel: cidade.trim(),
+        estadoImovel: estado,
+      },
+
+      statusImovel: status,
+
+      valorAluguelImovel:
+        converterMoedaParaNumero(aluguel),
+
+      valor_imovel:
+        converterMoedaParaNumero(valorImovel),
+
+      listaDespesas: [],
+    } as Omit<ImovelDto, "idImovel">;
+
+    try {
+      setCadastrando(true);
+
+      const mensagem =
+        await gerenciadorService.cadastrarImovel(
+          novoImovel
+        );
+
+      Alert.alert(
+        "Sucesso",
+        mensagem || "Imóvel cadastrado com sucesso."
+      );
+
+      limparFormulario();
+      onSuccess?.();
+    } catch (erro: unknown) {
+      console.error(
+        "Erro ao cadastrar imóvel:",
+        erro
+      );
+
+      const mensagem =
+        erro instanceof Error
+          ? erro.message
+          : "Não foi possível cadastrar o imóvel.";
+
+      Alert.alert("Erro", mensagem);
+    } finally {
+      setCadastrando(false);
+    }
   };
 
   return (
-    <ScrollView style={{ padding: 20 }}>
-      <Text style={{ fontSize: 20, marginBottom: 20 }}>Cadastrar Imóvel</Text>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.conteudo}
+      keyboardShouldPersistTaps="handled"
+    >
+      <Text style={styles.titulo}>
+        Cadastrar imóvel
+      </Text>
 
-      <Text>Nome *</Text>
-      <TextInput style={{ borderWidth: 1, marginBottom: 10, padding: 5 }} value={nome} onChangeText={setNome} />
+      <Text style={styles.rotulo}>Nome *</Text>
 
-      <Text>CEP *</Text>
-      <TextInput maxLength={8} style={{ borderWidth: 1, marginBottom: 10, padding: 5 }} value={cep} onChangeText={setCep} />
+      <TextInput
+        style={styles.campo}
+        value={nome}
+        onChangeText={setNome}
+        placeholder="Nome do imóvel"
+        editable={!cadastrando}
+      />
 
-      <Text>Rua *</Text>
-      <TextInput style={{ borderWidth: 1, marginBottom: 10, padding: 5 }} value={rua} onChangeText={setRua} />
+      <Text style={styles.rotulo}>CEP *</Text>
 
-      <Text>Bairro</Text>
-      <TextInput style={{ borderWidth: 1, marginBottom: 10, padding: 5 }} value={bairro} onChangeText={setBairro} />
+      <TextInput
+        style={styles.campo}
+        value={cep}
+        onChangeText={(texto) =>
+          setCep(texto.replace(/\D/g, ""))
+        }
+        placeholder="Somente números"
+        maxLength={8}
+        keyboardType="numeric"
+        editable={!cadastrando}
+      />
 
-      <Text>Cidade</Text>
-      <TextInput style={{ borderWidth: 1, marginBottom: 10, padding: 5 }} value={cidade} onChangeText={setCidade} />
+      <Text style={styles.rotulo}>Rua *</Text>
 
-      <Text>Estado</Text>
-      <Picker
-        selectedValue={estado}
-        onValueChange={(itemValue) => setEstado(itemValue)}
-        style={{ borderWidth: 1, marginBottom: 10 }}
-      >
-        <Picker.Item label="Paraná" value="Parana" />
-        <Picker.Item label="São Paulo" value="SaoPaulo" />
-      </Picker>
+      <TextInput
+        style={styles.campo}
+        value={rua}
+        onChangeText={setRua}
+        placeholder="Rua"
+        editable={!cadastrando}
+      />
 
-      <Text>Aluguel</Text>
-      <TextInput style={{ borderWidth: 1, marginBottom: 10, padding: 5 }} value={aluguel} onChangeText={setAluguel} keyboardType="numeric" />
+      <Text style={styles.rotulo}>Bairro</Text>
 
-      <Text>Valor do imóvel</Text>
-      <TextInput style={{ borderWidth: 1, marginBottom: 10, padding: 5 }} value={valor} onChangeText={setValor} keyboardType="numeric" />
+      <TextInput
+        style={styles.campo}
+        value={bairro}
+        onChangeText={setBairro}
+        placeholder="Bairro"
+        editable={!cadastrando}
+      />
 
-      <Text>Status</Text>
-      <Picker
-        selectedValue={status}
-        onValueChange={(itemValue) => setStatus(itemValue)}
-        style={{ borderWidth: 1, marginBottom: 20 }}
-      >
-        <Picker.Item label="Vago" value="Vago" />
-        <Picker.Item label="Alugado" value="Alugado" />
-      </Picker>
+      <Text style={styles.rotulo}>Cidade</Text>
 
-      <Button title="Enviar" onPress={enviar} />
+      <TextInput
+        style={styles.campo}
+        value={cidade}
+        onChangeText={setCidade}
+        placeholder="Cidade"
+        editable={!cadastrando}
+      />
+
+      <Text style={styles.rotulo}>Estado</Text>
+
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={estado}
+          enabled={!cadastrando}
+          onValueChange={(novoEstado) =>
+            setEstado(String(novoEstado))
+          }
+        >
+          <Picker.Item
+            label="Paraná"
+            value="Parana"
+          />
+
+          <Picker.Item
+            label="São Paulo"
+            value="SaoPaulo"
+          />
+        </Picker>
+      </View>
+
+      <Text style={styles.rotulo}>
+        Valor do aluguel *
+      </Text>
+
+      <TextInput
+        style={styles.campo}
+        value={aluguel}
+        onChangeText={(texto) =>
+          setAluguel(aplicarMascaraMoeda(texto))
+        }
+        placeholder="R$ 0,00"
+        keyboardType="numeric"
+        editable={!cadastrando}
+      />
+
+      <Text style={styles.rotulo}>
+        Valor do imóvel *
+      </Text>
+
+      <TextInput
+        style={styles.campo}
+        value={valorImovel}
+        onChangeText={(texto) =>
+          setValorImovel(
+            aplicarMascaraMoeda(texto)
+          )
+        }
+        placeholder="R$ 0,00"
+        keyboardType="numeric"
+        editable={!cadastrando}
+      />
+
+      <Text style={styles.rotulo}>Status</Text>
+
+      <View style={styles.pickerContainer}>
+        <Picker
+          selectedValue={status}
+          enabled={!cadastrando}
+          onValueChange={(novoStatus) =>
+            setStatus(String(novoStatus))
+          }
+        >
+          <Picker.Item
+            label="Vago"
+            value="Vago"
+          />
+
+          <Picker.Item
+            label="Alugado"
+            value="Alugado"
+          />
+        </Picker>
+      </View>
+
+      {cadastrando ? (
+        <View style={styles.carregamento}>
+          <ActivityIndicator
+            size="large"
+            color="#2563EB"
+          />
+
+          <Text style={styles.textoCarregamento}>
+            Cadastrando imóvel...
+          </Text>
+        </View>
+      ) : (
+        <Button
+          title="Cadastrar"
+          onPress={enviar}
+        />
+      )}
     </ScrollView>
   );
 }
 
-export { CadastrarImovel }
+const styles = StyleSheet.create({
+  container: {
+    width: "100%",
+  },
+
+  conteudo: {
+    padding: 20,
+    paddingBottom: 32,
+  },
+
+  titulo: {
+    marginBottom: 20,
+    color: "#0F172A",
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+
+  rotulo: {
+    marginBottom: 6,
+    color: "#334155",
+    fontSize: 14,
+    fontWeight: "600",
+  },
+
+  campo: {
+    minHeight: 46,
+    marginBottom: 14,
+    paddingHorizontal: 12,
+    borderWidth: 1,
+    borderColor: "#CBD5E1",
+    borderRadius: 3,
+    backgroundColor: "#FFFFFF",
+    color: "#0F172A",
+  },
+
+  pickerContainer: {
+    marginBottom: 14,
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#CBD5E1",
+    borderRadius: 3,
+    backgroundColor: "#FFFFFF",
+  },
+
+  carregamento: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+  },
+
+  textoCarregamento: {
+    marginTop: 10,
+    color: "#475569",
+  },
+});

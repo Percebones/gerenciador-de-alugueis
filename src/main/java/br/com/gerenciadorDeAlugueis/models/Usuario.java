@@ -30,6 +30,9 @@ public class Usuario implements Serializable {
 	@Column(name = "senha")
 	private String senha;
 
+	@Column(name = "role")
+	private String role;
+
 	public Usuario(Long id, String nome, String email, String senha) {
 		super();
 		this.id = id;

@@ -1,92 +1,380 @@
-import { useEffect, useState } from "react";
-import { ActivityIndicator, ScrollView, Touchable, TouchableOpacity, View } from "react-native";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { DataTable, Text } from "react-native-paper";
-import api from "../services/api";
+
+import { gerenciadorService } from "../services/gerenciadorService";
 import { ImovelDto } from "../types/types";
-import { ModalCadImovel, ModalDelImovel, ModalEditImovel } from "../components/modals"
-import Lista from "./ListaImoveis";
 
 export default function Despesas() {
-    const [dados, setDados] = useState<ImovelDto[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [idImovel, setId] = useState<number | null>(null);
-    const [totAluguel, setTotA] = useState<number>(0);
-    const [iptu, setIptu] = useState<number>(0);
-    const [condominio, setCondominio] = useState<number>(0);
+  const [imoveis, setImoveis] = useState<ImovelDto[]>([]);
+  const [carregando, setCarregando] = useState(true);
 
-    let TotAluguel = 0
-    let TotIptu = 0
-    let TotCondomino = 0
-    useEffect(() => {
-        api.get("/api/imoveis/busca")
-            .then((res) => {
-                console.log("DADOS:", res.data);
-                setDados(res.data);
-            })
-            .catch((err) => {
-                console.log("ERRO API:", err);
-            })
-            .finally(() => setLoading(false));
-    }, []);
+  const buscarImoveis = async (): Promise<void> => {
+    try {
+      setCarregando(true);
 
-    useEffect(() => {
-        if (dados.length > 0) {
-            let TotAluguel = 0;
-            for (let index = 0; index < dados.length; index++) {
-                TotIptu += Number(dados[index].despesa.iptuImovel)
-                TotCondomino += Number(dados[index].despesa.condominio)
-                if (dados[index].statusImovel === "Alugado") {
-                    TotAluguel += Number(dados[index].valorAluguelImovel);
-                }
-            }
-            setTotA(TotAluguel);
-            setIptu(TotIptu);
-            setCondominio(TotCondomino);
-            console.log("Total de aluguel:", TotAluguel);
+      const imoveisEncontrados =
+        await gerenciadorService.buscarTodosImoveis();
+
+      setImoveis(imoveisEncontrados);
+    } catch (erro: unknown) {
+      console.error(
+        "Erro ao buscar imóveis para calcular despesas:",
+        erro
+      );
+
+      const mensagem =
+        erro instanceof Error
+          ? erro.message
+          : "Não foi possível carregar as despesas.";
+
+      Alert.alert("Erro", mensagem);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  useEffect(() => {
+    buscarImoveis();
+  }, []);
+
+  const totais = useMemo(() => {
+    return imoveis.reduce(
+      (acumulador, imovel) => {
+        const imovelEstaAlugado =
+          imovel.statusImovel?.toUpperCase() ===
+          "ALUGADO";
+
+        if (imovelEstaAlugado) {
+          acumulador.totalAlugueis += Number(
+            imovel.valorAluguelImovel
+          );
         }
-    }, [dados]);
 
-    if (loading) {
-        return (
-            <View>
-
-            </View>
+        /*
+         * Mantive "despesa" porque esse era o campo usado
+         * no seu componente original.
+         */
+        acumulador.totalIptu += Number(
+          imovel.despesa?.iptuImovel ?? 0
         );
+
+        acumulador.totalCondominio += Number(
+          imovel.despesa?.condominio ?? 0
+        );
+
+        return acumulador;
+      },
+      {
+        totalAlugueis: 0,
+        totalIptu: 0,
+        totalCondominio: 0,
+      }
+    );
+  }, [imoveis]);
+
+  const impostoDeRenda = useMemo(() => {
+    if (totais.totalAlugueis <= 1000) {
+      return 0;
     }
 
-
-
-
-    return (
-        <ScrollView style={{ padding: 20 }}>
-            <ScrollView style={{ alignSelf: 'center' }}>
-                <View style={{ padding: 20, width: 1300 }}>
-                    <Text style={{ fontSize: 20, fontWeight: "bold", marginBottom: 10 }}>
-                        |Despesas Totais|
-                    </Text>
-
-                    <DataTable style={{ backgroundColor: '#fff', borderRadius: 12, overflow: 'hidden', borderWidth: 1 }}>
-                        <DataTable.Row>
-                            <DataTable.Cell style={{ flex: 1 }}>
-                                <Text style={{ fontWeight: "bold", fontSize: 25 }}>TOTAL EM IR SOBRE: R${totAluguel.toLocaleString('pt-BR')}:  R${totAluguel > 0 ? Math.round((totAluguel - 1000) * 0.275) : 0}</Text>
-                            </DataTable.Cell>
-                        </DataTable.Row>
-                        <DataTable.Row>
-                            <DataTable.Cell style={{ flex: 1 }}>
-                                <Text style={{ fontWeight: "bold", fontSize: 25 }}>TOTAL EM IPTU: {iptu}</Text>
-                            </DataTable.Cell>
-                        </DataTable.Row>
-                        <DataTable.Row>
-                            <DataTable.Cell style={{ flex: 1 }}>
-                                <Text style={{ fontWeight: "bold", fontSize: 25 }}>TOTAL EM CONDOMINIO: {condominio}</Text>
-                            </DataTable.Cell>
-                        </DataTable.Row>
-
-                    </DataTable>
-                </View>
-            </ScrollView>
-        </ScrollView>
+    return Math.round(
+      (totais.totalAlugueis - 1000) * 0.275
     );
+  }, [totais.totalAlugueis]);
+
+  const formatarMoeda = (valor: number): string => {
+    return valor.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    });
+  };
+
+  if (carregando) {
+    return (
+      <View style={styles.carregamento}>
+        <ActivityIndicator
+          size="large"
+          color="#2563EB"
+        />
+
+        <Text style={styles.textoCarregamento}>
+          Carregando despesas...
+        </Text>
+      </View>
+    );
+  }
+
+  return (
+    <View style={styles.container}>
+      <Text style={styles.titulo}>
+        Despesas Totais
+      </Text>
+
+      <Text style={styles.subtitulo}>
+        Resumo financeiro dos imóveis cadastrados
+      </Text>
+
+      <ScrollView
+        horizontal
+        style={styles.scrollTabela}
+        contentContainerStyle={styles.conteudoScroll}
+        showsHorizontalScrollIndicator={false}
+      >
+        <View style={styles.tabelaContainer}>
+          <DataTable style={styles.tabela}>
+            <DataTable.Header style={styles.cabecalho}>
+              <DataTable.Title
+                style={styles.colunaDescricao}
+              >
+                DESCRIÇÃO
+              </DataTable.Title>
+
+              <DataTable.Title
+                numeric
+                style={styles.colunaValor}
+              >
+                VALOR
+              </DataTable.Title>
+            </DataTable.Header>
+
+            <DataTable.Row style={styles.linha}>
+              <DataTable.Cell
+                style={styles.colunaDescricao}
+              >
+                <Text style={styles.descricao}>
+                  Receita total de aluguéis
+                </Text>
+              </DataTable.Cell>
+
+              <DataTable.Cell
+                numeric
+                style={styles.colunaValor}
+              >
+                <Text style={styles.valorReceita}>
+                  {formatarMoeda(
+                    totais.totalAlugueis
+                  )}
+                </Text>
+              </DataTable.Cell>
+            </DataTable.Row>
+
+            <DataTable.Row style={styles.linha}>
+              <DataTable.Cell
+                style={styles.colunaDescricao}
+              >
+                <Text style={styles.descricao}>
+                  Estimativa de Imposto de Renda
+                </Text>
+              </DataTable.Cell>
+
+              <DataTable.Cell
+                numeric
+                style={styles.colunaValor}
+              >
+                <Text style={styles.valorDespesa}>
+                  {formatarMoeda(impostoDeRenda)}
+                </Text>
+              </DataTable.Cell>
+            </DataTable.Row>
+
+            <DataTable.Row style={styles.linha}>
+              <DataTable.Cell
+                style={styles.colunaDescricao}
+              >
+                <Text style={styles.descricao}>
+                  Total de IPTU
+                </Text>
+              </DataTable.Cell>
+
+              <DataTable.Cell
+                numeric
+                style={styles.colunaValor}
+              >
+                <Text style={styles.valorDespesa}>
+                  {formatarMoeda(totais.totalIptu)}
+                </Text>
+              </DataTable.Cell>
+            </DataTable.Row>
+
+            <DataTable.Row style={styles.linha}>
+              <DataTable.Cell
+                style={styles.colunaDescricao}
+              >
+                <Text style={styles.descricao}>
+                  Total de condomínio
+                </Text>
+              </DataTable.Cell>
+
+              <DataTable.Cell
+                numeric
+                style={styles.colunaValor}
+              >
+                <Text style={styles.valorDespesa}>
+                  {formatarMoeda(
+                    totais.totalCondominio
+                  )}
+                </Text>
+              </DataTable.Cell>
+            </DataTable.Row>
+
+            <DataTable.Row style={styles.linhaTotal}>
+              <DataTable.Cell
+                style={styles.colunaDescricao}
+              >
+                <Text style={styles.descricaoTotal}>
+                  Total estimado de despesas
+                </Text>
+              </DataTable.Cell>
+
+              <DataTable.Cell
+                numeric
+                style={styles.colunaValor}
+              >
+                <Text style={styles.valorTotal}>
+                  {formatarMoeda(
+                    impostoDeRenda +
+                      totais.totalIptu +
+                      totais.totalCondominio
+                  )}
+                </Text>
+              </DataTable.Cell>
+            </DataTable.Row>
+          </DataTable>
+        </View>
+      </ScrollView>
+    </View>
+  );
 }
 
-export { Despesas }
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    width: "100%",
+    padding: 20,
+    backgroundColor: "#F8FAFC",
+  },
+
+  carregamento: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  textoCarregamento: {
+    marginTop: 12,
+    color: "#475569",
+  },
+
+  titulo: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#0F172A",
+  },
+
+  subtitulo: {
+    marginTop: 6,
+    marginBottom: 20,
+    fontSize: 16,
+    color: "#475569",
+  },
+
+  scrollTabela: {
+    width: "100%",
+  },
+
+  conteudoScroll: {
+    flexGrow: 1,
+    width: "100%",
+    paddingBottom: 16,
+  },
+
+  tabelaContainer: {
+    width: "100%",
+    minWidth: 700,
+  },
+
+  tabela: {
+    width: "100%",
+    overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#000000",
+    borderRadius: 12,
+    backgroundColor: "#FFFFFF",
+  },
+
+  cabecalho: {
+    width: "100%",
+    minHeight: 64,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F1F5F9",
+    borderBottomWidth: 1,
+    borderBottomColor: "#CBD5E1",
+  },
+
+  linha: {
+    width: "100%",
+    minHeight: 64,
+    flexDirection: "row",
+    alignItems: "center",
+    borderBottomWidth: 1,
+    borderBottomColor: "#E2E8F0",
+  },
+
+  linhaTotal: {
+    width: "100%",
+    minHeight: 68,
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#F1F5F9",
+  },
+
+  colunaDescricao: {
+    flex: 4,
+    paddingHorizontal: 20,
+  },
+
+  colunaValor: {
+    flex: 2,
+    paddingHorizontal: 20,
+  },
+
+  descricao: {
+    color: "#334155",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  descricaoTotal: {
+    color: "#0F172A",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  valorReceita: {
+    color: "#166534",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  valorDespesa: {
+    color: "#B91C1C",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+
+  valorTotal: {
+    color: "#991B1B",
+    fontSize: 17,
+    fontWeight: "bold",
+  },
+});
+
+export { Despesas };

@@ -1,40 +1,75 @@
 // src/types/imovel.types.ts
+
+export type StatusImovel = "ALUGADO" | "VAGO";
+
+export type Estado =
+  | "AC"
+  | "AL"
+  | "AP"
+  | "AM"
+  | "BA"
+  | "CE"
+  | "DF"
+  | "ES"
+  | "GO"
+  | "MA"
+  | "MT"
+  | "MS"
+  | "MG"
+  | "PA"
+  | "PB"
+  | "PR"
+  | "PE"
+  | "PI"
+  | "RJ"
+  | "RN"
+  | "RS"
+  | "RO"
+  | "RR"
+  | "SC"
+  | "SP"
+  | "SE"
+  | "TO";
+
 export interface EnderecoDto {
+  idEndereco?: number;
   cepImovel: string;
   ruaImovel: string;
   bairroImovel: string;
   cidadeImovel: string;
-  estadoImovel: string;
+  estadoImovel: Estado;
 }
 
-export interface DespesaDto{
-  iptuImovel: bigint;
+export interface DespesaDto {
+  idDespesa?: number;
+  iptuImovel: number;
+  condominio: number;
 }
 
 export interface ImovelDto {
   idImovel: number;
   nomeImovel: string;
-  endereco:EnderecoDto;
-  statusImovel: string;
-  valorAluguelImovel: bigint;
-  valor_imovel: bigint;
-  despesa:DespesaDto;
+  endereco: EnderecoDto | null;
+  statusImovel: StatusImovel;
+  valorAluguelImovel: number;
+  valor_imovel: number;
+  listaDespesas: DespesaDto[];
 }
 
-// Resposta padrão da API (quando você retornar ResponseEntity<ApiResponse<...>> no backend)
 export interface ApiResponse<T> {
   data: T;
   message?: string;
-  success?: boolean;
+  success: boolean;
   timestamp?: string;
 }
 
-// Resposta paginada (quando você usar Page<Imovel> no backend)
 export interface PaginatedResponse<T> {
   content: T[];
-  page: number;
+  number: number;
   size: number;
   totalElements: number;
   totalPages: number;
+  first: boolean;
   last: boolean;
+  empty: boolean;
 }
