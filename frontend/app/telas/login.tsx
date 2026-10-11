@@ -53,19 +53,12 @@ export default function Login({
         senha
       );
 
-      if (!resultado.sucesso) {
-        Alert.alert(
-          "Login inválido",
-          resultado.mensagem
-        );
-
+      if (resultado.status !== 200) {
+        Alert.alert("Login inválido",resultado.mensagem);
         return;
       }
 
-      Alert.alert(
-        "Sucesso",
-        resultado.mensagem
-      );
+      Alert.alert("Sucesso",resultado.mensagem);
 
       onLoginRealizado();
     } catch (erro: unknown) {

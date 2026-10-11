@@ -1,14 +1,10 @@
-// src/services/gerenciadorService.ts
-
 import axios from "axios";
-
 import api from "./api";
 
 import {
   CriarImovelDto,
   ImovelDto,
   LoginRequest,
-  ResultadoLogin,
 } from "../types/types";
 
 const LOGIN_URL = "/api/v1/login";
@@ -87,7 +83,7 @@ export const gerenciadorService = {
   login: async (
     identificador: string,
     senha: string
-  ): Promise<ResultadoLogin> => {
+  ): Promise<{ status: number; mensagem: string }> => {
     try {
       const dadosLogin = montarUsuarioLogin(
         identificador,
@@ -100,12 +96,12 @@ export const gerenciadorService = {
       );
 
       return {
-        sucesso: true,
+        status: response.status,
         mensagem: response.data,
       };
     } catch (erro: unknown) {
       return {
-        sucesso: false,
+        status: 500,
         mensagem: extrairMensagemErro(
           erro,
           "Não foi possível realizar o login."
@@ -182,7 +178,7 @@ export const gerenciadorService = {
 
     try {
       const response = await api.post<string>(
-        `${IMOVEL_URL}/update`,
+        `${IMOVEL_URL}/updateImovel`,
         imovel
       );
 
@@ -208,7 +204,7 @@ export const gerenciadorService = {
 
     try {
       const response = await api.delete<string>(
-        `${IMOVEL_URL}/del/${idImovel}`
+        `${IMOVEL_URL}/deleteImovel/${idImovel}`
       );
 
       return response.data;

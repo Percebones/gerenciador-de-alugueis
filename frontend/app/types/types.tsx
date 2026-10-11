@@ -2,42 +2,13 @@
 
 export type StatusImovel = "ALUGADO" | "VAGO";
 
-export type Estado =
-  | "AC"
-  | "AL"
-  | "AP"
-  | "AM"
-  | "BA"
-  | "CE"
-  | "DF"
-  | "ES"
-  | "GO"
-  | "MA"
-  | "MT"
-  | "MS"
-  | "MG"
-  | "PA"
-  | "PB"
-  | "PR"
-  | "PE"
-  | "PI"
-  | "RJ"
-  | "RN"
-  | "RS"
-  | "RO"
-  | "RR"
-  | "SC"
-  | "SP"
-  | "SE"
-  | "TO";
-
 export interface EnderecoDto {
   idEndereco?: number;
   cepImovel: string;
   ruaImovel: string;
   bairroImovel: string;
   cidadeImovel: string;
-  estadoImovel: Estado;
+  estadoImovel: string;
 }
 
 export interface DespesaDto {
@@ -49,7 +20,7 @@ export interface DespesaDto {
 export interface ImovelDto {
   idImovel: number;
   nomeImovel: string;
-  endereco: EnderecoDto | null;
+  endereco: EnderecoDto;
   statusImovel: StatusImovel;
   valorAluguelImovel: number;
   valor_imovel: number;

@@ -89,7 +89,7 @@ function ModalDelImovel({
 
         {children}
 
-        <DeletarImovel idImovel={idImovel} />
+        <DeletarImovel idImovel={idImovel} onSuccess={onClose}/>
       </div>
     </div>,
     document.body

@@ -84,8 +84,6 @@ public class ImovelController {
     public ResponseEntity<?> getAllImoveis() {
         try {
             List<Imovel> imoveis = imovelService.findAll();
-            if (imoveis.isEmpty()) throw new GerenciadorException("Nenhum imovel encontrado");
-
             return new ResponseEntity<>(imoveis, HttpStatus.OK);
         } catch (GerenciadorException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
@@ -99,6 +97,7 @@ public class ImovelController {
     public ResponseEntity<?> getImoveisById(@PathVariable Long id) {
         try {
             Optional<Imovel> imovel = imovelService.findById(id);
+            if (imovel.isEmpty()) throw new GerenciadorException("Nenhum imovel encontrado");
             return new ResponseEntity<>(imovel, HttpStatus.OK);
         } catch (GerenciadorException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
