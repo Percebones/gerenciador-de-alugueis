@@ -12,32 +12,30 @@ import {
 } from "react-native";
 
 import { gerenciadorService } from "../services/gerenciadorService";
-import { ImovelDto } from "../types/types";
+import {
+  CriarImovelDto,
+  StatusImovel,
+} from "../types/types";
 
 interface CadastrarImovelProps {
   onSuccess?: () => void;
 }
 
-const formatarNumeroComoMoeda = (
-  valor: number
-): string => {
+const formatarNumeroComoMoeda = (valor: number): string => {
   return valor.toLocaleString("pt-BR", {
     style: "currency",
     currency: "BRL",
   });
 };
 
-const aplicarMascaraMoeda = (
-  texto: string
-): string => {
+const aplicarMascaraMoeda = (texto: string): string => {
   const somenteNumeros = texto.replace(/\D/g, "");
 
   if (!somenteNumeros) {
     return "";
   }
 
-  const valorNumerico =
-    Number(somenteNumeros) / 100;
+  const valorNumerico = Number(somenteNumeros) / 100;
 
   return formatarNumeroComoMoeda(valorNumerico);
 };
@@ -45,8 +43,7 @@ const aplicarMascaraMoeda = (
 const converterMoedaParaNumero = (
   valorFormatado: string
 ): number => {
-  const somenteNumeros =
-    valorFormatado.replace(/\D/g, "");
+  const somenteNumeros = valorFormatado.replace(/\D/g, "");
 
   if (!somenteNumeros) {
     return 0;
@@ -64,14 +61,11 @@ export function CadastrarImovel({
   const [bairro, setBairro] = useState("");
   const [cidade, setCidade] = useState("");
   const [estado, setEstado] = useState("Parana");
-
   const [aluguel, setAluguel] = useState("");
-  const [valorImovel, setValorImovel] =
-    useState("");
-
-  const [status, setStatus] = useState("Vago");
-  const [cadastrando, setCadastrando] =
-    useState(false);
+  const [valorImovel, setValorImovel] = useState("");
+  const [status, setStatus] =
+    useState<StatusImovel>("Vago" as StatusImovel);
+  const [cadastrando, setCadastrando] = useState(false);
 
   const formularioEstaValido = (): boolean => {
     if (!nome.trim()) {
@@ -79,7 +73,6 @@ export function CadastrarImovel({
         "Campo obrigatório",
         "Informe o nome do imóvel."
       );
-
       return false;
     }
 
@@ -88,7 +81,6 @@ export function CadastrarImovel({
         "Campo obrigatório",
         "Informe o CEP do imóvel."
       );
-
       return false;
     }
 
@@ -97,7 +89,6 @@ export function CadastrarImovel({
         "CEP inválido",
         "O CEP deve possuir 8 números."
       );
-
       return false;
     }
 
@@ -106,7 +97,22 @@ export function CadastrarImovel({
         "Campo obrigatório",
         "Informe a rua do imóvel."
       );
+      return false;
+    }
 
+    if (!bairro.trim()) {
+      Alert.alert(
+        "Campo obrigatório",
+        "Informe o bairro do imóvel."
+      );
+      return false;
+    }
+
+    if (!cidade.trim()) {
+      Alert.alert(
+        "Campo obrigatório",
+        "Informe a cidade do imóvel."
+      );
       return false;
     }
 
@@ -115,16 +121,6 @@ export function CadastrarImovel({
         "Campo obrigatório",
         "Informe o estado do imóvel."
       );
-
-      return false;
-    }
-
-    if (!status) {
-      Alert.alert(
-        "Campo obrigatório",
-        "Informe o status do imóvel."
-      );
-
       return false;
     }
 
@@ -133,7 +129,6 @@ export function CadastrarImovel({
         "Campo obrigatório",
         "Informe o valor do aluguel."
       );
-
       return false;
     }
 
@@ -142,13 +137,11 @@ export function CadastrarImovel({
         "Campo obrigatório",
         "Informe o valor do imóvel."
       );
-
       return false;
     }
 
     const aluguelConvertido =
       converterMoedaParaNumero(aluguel);
-
     const valorImovelConvertido =
       converterMoedaParaNumero(valorImovel);
 
@@ -157,7 +150,6 @@ export function CadastrarImovel({
         "Valor inválido",
         "Informe um valor de aluguel válido."
       );
-
       return false;
     }
 
@@ -166,7 +158,6 @@ export function CadastrarImovel({
         "Valor inválido",
         "Informe um valor de imóvel maior que zero."
       );
-
       return false;
     }
 
@@ -182,7 +173,7 @@ export function CadastrarImovel({
     setEstado("Parana");
     setAluguel("");
     setValorImovel("");
-    setStatus("Vago");
+    setStatus("Vago" as StatusImovel);
   };
 
   const enviar = async (): Promise<void> => {
@@ -190,9 +181,8 @@ export function CadastrarImovel({
       return;
     }
 
-    const novoImovel = {
+    const novoImovel: CriarImovelDto = {
       nomeImovel: nome.trim(),
-
       endereco: {
         cepImovel: cep.trim(),
         ruaImovel: rua.trim(),
@@ -200,25 +190,18 @@ export function CadastrarImovel({
         cidadeImovel: cidade.trim(),
         estadoImovel: estado,
       },
-
       statusImovel: status,
-
       valorAluguelImovel:
         converterMoedaParaNumero(aluguel),
-
       valor_imovel:
         converterMoedaParaNumero(valorImovel),
-
-      listaDespesas: [],
-    } as Omit<ImovelDto, "idImovel">;
+    };
 
     try {
       setCadastrando(true);
 
       const mensagem =
-        await gerenciadorService.cadastrarImovel(
-          novoImovel
-        );
+        await gerenciadorService.cadastrarImovel(novoImovel);
 
       Alert.alert(
         "Sucesso",
@@ -228,10 +211,7 @@ export function CadastrarImovel({
       limparFormulario();
       onSuccess?.();
     } catch (erro: unknown) {
-      console.error(
-        "Erro ao cadastrar imóvel:",
-        erro
-      );
+      console.error("Erro ao cadastrar imóvel:", erro);
 
       const mensagem =
         erro instanceof Error
@@ -250,12 +230,9 @@ export function CadastrarImovel({
       contentContainerStyle={styles.conteudo}
       keyboardShouldPersistTaps="handled"
     >
-      <Text style={styles.titulo}>
-        Cadastrar imóvel
-      </Text>
+      <Text style={styles.titulo}>Cadastrar imóvel</Text>
 
       <Text style={styles.rotulo}>Nome *</Text>
-
       <TextInput
         style={styles.campo}
         value={nome}
@@ -265,7 +242,6 @@ export function CadastrarImovel({
       />
 
       <Text style={styles.rotulo}>CEP *</Text>
-
       <TextInput
         style={styles.campo}
         value={cep}
@@ -279,7 +255,6 @@ export function CadastrarImovel({
       />
 
       <Text style={styles.rotulo}>Rua *</Text>
-
       <TextInput
         style={styles.campo}
         value={rua}
@@ -288,8 +263,7 @@ export function CadastrarImovel({
         editable={!cadastrando}
       />
 
-      <Text style={styles.rotulo}>Bairro</Text>
-
+      <Text style={styles.rotulo}>Bairro *</Text>
       <TextInput
         style={styles.campo}
         value={bairro}
@@ -298,8 +272,7 @@ export function CadastrarImovel({
         editable={!cadastrando}
       />
 
-      <Text style={styles.rotulo}>Cidade</Text>
-
+      <Text style={styles.rotulo}>Cidade *</Text>
       <TextInput
         style={styles.campo}
         value={cidade}
@@ -308,8 +281,7 @@ export function CadastrarImovel({
         editable={!cadastrando}
       />
 
-      <Text style={styles.rotulo}>Estado</Text>
-
+      <Text style={styles.rotulo}>Estado *</Text>
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={estado}
@@ -318,22 +290,12 @@ export function CadastrarImovel({
             setEstado(String(novoEstado))
           }
         >
-          <Picker.Item
-            label="Paraná"
-            value="Parana"
-          />
-
-          <Picker.Item
-            label="São Paulo"
-            value="SaoPaulo"
-          />
+          <Picker.Item label="Paraná" value="Parana" />
+          <Picker.Item label="São Paulo" value="SaoPaulo" />
         </Picker>
       </View>
 
-      <Text style={styles.rotulo}>
-        Valor do aluguel *
-      </Text>
-
+      <Text style={styles.rotulo}>Valor do aluguel *</Text>
       <TextInput
         style={styles.campo}
         value={aluguel}
@@ -345,61 +307,41 @@ export function CadastrarImovel({
         editable={!cadastrando}
       />
 
-      <Text style={styles.rotulo}>
-        Valor do imóvel *
-      </Text>
-
+      <Text style={styles.rotulo}>Valor do imóvel *</Text>
       <TextInput
         style={styles.campo}
         value={valorImovel}
         onChangeText={(texto) =>
-          setValorImovel(
-            aplicarMascaraMoeda(texto)
-          )
+          setValorImovel(aplicarMascaraMoeda(texto))
         }
         placeholder="R$ 0,00"
         keyboardType="numeric"
         editable={!cadastrando}
       />
 
-      <Text style={styles.rotulo}>Status</Text>
-
+      <Text style={styles.rotulo}>Status *</Text>
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={status}
           enabled={!cadastrando}
           onValueChange={(novoStatus) =>
-            setStatus(String(novoStatus))
+            setStatus(novoStatus as StatusImovel)
           }
         >
-          <Picker.Item
-            label="Vago"
-            value="Vago"
-          />
-
-          <Picker.Item
-            label="Alugado"
-            value="Alugado"
-          />
+          <Picker.Item label="Vago" value="Vago" />
+          <Picker.Item label="Alugado" value="Alugado" />
         </Picker>
       </View>
 
       {cadastrando ? (
         <View style={styles.carregamento}>
-          <ActivityIndicator
-            size="large"
-            color="#2563EB"
-          />
-
+          <ActivityIndicator size="large" color="#2563EB" />
           <Text style={styles.textoCarregamento}>
             Cadastrando imóvel...
           </Text>
         </View>
       ) : (
-        <Button
-          title="Cadastrar"
-          onPress={enviar}
-        />
+        <Button title="Cadastrar" onPress={enviar} />
       )}
     </ScrollView>
   );
@@ -409,26 +351,22 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
   },
-
   conteudo: {
     padding: 20,
     paddingBottom: 32,
   },
-
   titulo: {
     marginBottom: 20,
     color: "#0F172A",
     fontSize: 22,
     fontWeight: "bold",
   },
-
   rotulo: {
     marginBottom: 6,
     color: "#334155",
     fontSize: 14,
     fontWeight: "600",
   },
-
   campo: {
     minHeight: 46,
     marginBottom: 14,
@@ -439,7 +377,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     color: "#0F172A",
   },
-
   pickerContainer: {
     marginBottom: 14,
     overflow: "hidden",
@@ -448,13 +385,11 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: "#FFFFFF",
   },
-
   carregamento: {
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 12,
   },
-
   textoCarregamento: {
     marginTop: 10,
     color: "#475569",

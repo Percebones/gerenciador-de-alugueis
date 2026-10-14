@@ -5,13 +5,17 @@ import {
 
 import Painel from "./painel";
 
-export default function Home() {
+interface HomeProps {
+  onSair?: () => void;
+}
+
+export default function Home({ onSair }: HomeProps) {
   return (
     <ScrollView
       contentContainerStyle={styles.container}
       showsVerticalScrollIndicator={false}
     >
-      <Painel />
+      <Painel onSair={onSair} />
     </ScrollView>
   );
 }
@@ -19,5 +23,7 @@ export default function Home() {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
+    width: "100%",
+    backgroundColor: "#F8FAFC",
   },
 });

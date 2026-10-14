@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Platform, StyleSheet, View } from "react-native";
 
 import Home from "./telas/home";
 import Login from "./telas/login";
@@ -7,6 +7,13 @@ import Login from "./telas/login";
 type TelaAtual = "login" | "home";
 
 export default function App() {
+
+  useEffect(() => {
+    if (Platform.OS === "web") {
+      document.title = "Gerenciador de Aluguéis";
+    }
+  }, []);
+
   const [telaAtual, setTelaAtual] =
     useState<TelaAtual>("login");
 

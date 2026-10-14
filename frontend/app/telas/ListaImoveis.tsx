@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { DataTable, Text, IconButton } from "react-native-paper";
+import { DataTable, IconButton, Text } from "react-native-paper";
 
 import {
   ModalCadImovel,
@@ -17,6 +17,80 @@ import {
 
 import { gerenciadorService } from "../services/gerenciadorService";
 import { ImovelDto } from "../types/types";
+
+/**
+ * Representa os formatos possíveis retornados pelo serviço.
+ *
+ * A API pode retornar:
+ * 1. Diretamente um array de imóveis;
+ * 2. Um objeto Axios contendo o array em "data";
+ * 3. Um objeto contendo o array na propriedade "imoveis".
+ */
+type RespostaImoveis = {
+  data?: unknown;
+  imoveis?: unknown;
+};
+
+/**
+ * Extrai e valida a lista de imóveis recebida do serviço.
+ *
+ * Essa função evita que valores que não sejam arrays sejam
+ * armazenados no estado da tela.
+ */
+function extrairListaImoveis(resposta: unknown): ImovelDto[] {
+  if (Array.isArray(resposta)) {
+    return resposta as ImovelDto[];
+  }
+
+  if (resposta !== null && typeof resposta === "object") {
+    const respostaObjeto = resposta as RespostaImoveis;
+
+    if (Array.isArray(respostaObjeto.data)) {
+      return respostaObjeto.data as ImovelDto[];
+    }
+
+    if (Array.isArray(respostaObjeto.imoveis)) {
+      return respostaObjeto.imoveis as ImovelDto[];
+    }
+
+    if (
+      respostaObjeto.data !== null &&
+      typeof respostaObjeto.data === "object"
+    ) {
+      const conteudoData = respostaObjeto.data as RespostaImoveis;
+
+      if (Array.isArray(conteudoData.imoveis)) {
+        return conteudoData.imoveis as ImovelDto[];
+      }
+    }
+  }
+
+  throw new Error("A API não retornou uma lista válida de imóveis.");
+}
+
+/**
+ * Converte um valor numérico recebido da API.
+ *
+ * Caso o valor seja nulo, indefinido ou inválido,
+ * retorna zero para evitar NaN nos cálculos e na interface.
+ */
+function converterParaNumero(valor: unknown): number {
+  const numeroConvertido = Number(valor);
+
+  return Number.isFinite(numeroConvertido)
+    ? numeroConvertido
+    : 0;
+}
+
+/**
+ * Formata valores monetários no padrão brasileiro.
+ */
+function formatarMoeda(valor: unknown): string {
+  return converterParaNumero(valor).toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
+}
 
 export default function Lista() {
   const [imoveis, setImoveis] = useState<ImovelDto[]>([]);
@@ -41,12 +115,16 @@ export default function Lista() {
     try {
       setCarregando(true);
 
-      const imoveisEncontrados =
+      const resposta =
         await gerenciadorService.buscarTodosImoveis();
 
-      setImoveis(imoveisEncontrados);
+      const listaImoveis = extrairListaImoveis(resposta);
+
+      setImoveis(listaImoveis);
     } catch (erro: unknown) {
       console.error("Erro ao buscar imóveis:", erro);
+
+      setImoveis([]);
 
       const mensagem =
         erro instanceof Error
@@ -60,46 +138,44 @@ export default function Lista() {
   };
 
   useEffect(() => {
-    buscarImoveis();
+    void buscarImoveis();
   }, []);
 
   const totalAlugueis = useMemo(() => {
     return imoveis.reduce((totalAtual, imovel) => {
       const statusNormalizado =
-        imovel.statusImovel?.toUpperCase();
+        imovel.statusImovel?.trim().toUpperCase();
 
       if (statusNormalizado !== "ALUGADO") {
         return totalAtual;
       }
 
-      return (
-        totalAtual +
-        Number(imovel.valorAluguelImovel)
+      const valorAluguel = converterParaNumero(
+        imovel.valorAluguelImovel
       );
+
+      return totalAtual + valorAluguel;
     }, 0);
   }, [imoveis]);
 
-  const fecharModalCadastro =
-    async (): Promise<void> => {
-      setModalCadastroAberto(false);
-      await buscarImoveis();
-    };
+  const fecharModalCadastro = async (): Promise<void> => {
+    setModalCadastroAberto(false);
+    await buscarImoveis();
+  };
 
-  const fecharModalEdicao =
-    async (): Promise<void> => {
-      setModalEdicaoAberto(false);
-      setImovelSelecionado(null);
+  const fecharModalEdicao = async (): Promise<void> => {
+    setModalEdicaoAberto(false);
+    setImovelSelecionado(null);
 
-      await buscarImoveis();
-    };
+    await buscarImoveis();
+  };
 
-  const fecharModalExclusao =
-    async (): Promise<void> => {
-      setModalExclusaoAberto(false);
-      setIdImovelSelecionado(null);
+  const fecharModalExclusao = async (): Promise<void> => {
+    setModalExclusaoAberto(false);
+    setIdImovelSelecionado(null);
 
-      await buscarImoveis();
-    };
+    await buscarImoveis();
+  };
 
   if (carregando) {
     return (
@@ -145,11 +221,7 @@ export default function Lista() {
       </Text>
 
       <Text style={styles.total}>
-        Soma dos aluguéis:{" "}
-        {totalAlugueis.toLocaleString("pt-BR", {
-          style: "currency",
-          currency: "BRL",
-        })}
+        Soma dos aluguéis: {formatarMoeda(totalAlugueis)}
       </Text>
 
       <ScrollView
@@ -212,7 +284,9 @@ export default function Lista() {
                   size={26}
                   iconColor="#2563EB"
                   style={styles.botaoIconeCadastrar}
-                  onPress={() => setModalCadastroAberto(true)}
+                  onPress={() =>
+                    setModalCadastroAberto(true)
+                  }
                   accessibilityLabel="Cadastrar novo imóvel"
                 />
               </DataTable.Title>
@@ -220,7 +294,9 @@ export default function Lista() {
 
             {imoveis.map((imovel) => {
               const statusNormalizado =
-                imovel.statusImovel?.toUpperCase();
+                imovel.statusImovel
+                  ?.trim()
+                  .toUpperCase() ?? "VAGO";
 
               const imovelEstaAlugado =
                 statusNormalizado === "ALUGADO";
@@ -277,12 +353,9 @@ export default function Lista() {
                       style={styles.valorAluguel}
                       numberOfLines={1}
                     >
-                      {Number(
+                      {formatarMoeda(
                         imovel.valorAluguelImovel
-                      ).toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
+                      )}
                     </Text>
                   </DataTable.Cell>
 
@@ -294,12 +367,7 @@ export default function Lista() {
                       style={styles.valorImovel}
                       numberOfLines={1}
                     >
-                      {Number(
-                        imovel.valor_imovel
-                      ).toLocaleString("pt-BR", {
-                        style: "currency",
-                        currency: "BRL",
-                      })}
+                      {formatarMoeda(imovel.valor_imovel)}
                     </Text>
                   </DataTable.Cell>
 
@@ -323,6 +391,8 @@ export default function Lista() {
                         setImovelSelecionado(imovel);
                         setModalEdicaoAberto(true);
                       }}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Editar ${imovel.nomeImovel}`}
                     >
                       <Text style={styles.iconeEditar}>
                         ✎
@@ -340,6 +410,8 @@ export default function Lista() {
 
                         setModalExclusaoAberto(true);
                       }}
+                      accessibilityRole="button"
+                      accessibilityLabel={`Excluir ${imovel.nomeImovel}`}
                     >
                       <Text style={styles.iconeExcluir}>
                         ✖
@@ -526,10 +598,10 @@ const styles = StyleSheet.create({
   },
 
   botaoIconeCadastrar: {
-  margin: 0,
-  alignSelf: "center",
-  transform: [{ translateY: -7 }],
-},
+    margin: 0,
+    alignSelf: "center",
+    transform: [{ translateY: -7 }],
+  },
 
   iconeEditar: {
     color: "#2563EB",
@@ -548,6 +620,4 @@ const styles = StyleSheet.create({
     color: "#64748B",
     textAlign: "center",
   },
-
-
 });

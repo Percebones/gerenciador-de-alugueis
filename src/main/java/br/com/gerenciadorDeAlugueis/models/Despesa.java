@@ -1,5 +1,6 @@
 package br.com.gerenciadorDeAlugueis.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,6 +21,7 @@ public class Despesa implements Serializable {
     @Column(name = "id_despesa")
     private Long idDespesa;
 
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "id_imovel", nullable = false)
     private Imovel imovel;

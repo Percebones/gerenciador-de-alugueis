@@ -8,8 +8,9 @@ public record DespesaDTO(
 
         Long idDespesa,
         Imovel imovel,
-        BigInteger iptuImovel
-) {
+        String nomeDespesa,
+        BigInteger valorDespesa
+        ) {
 
 
 }

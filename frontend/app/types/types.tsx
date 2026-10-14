@@ -13,8 +13,8 @@ export interface EnderecoDto {
 
 export interface DespesaDto {
   idDespesa?: number;
-  iptuImovel: number;
-  condominio: number;
+  nomeDespesa: string;
+  valorDespesa: number;
 }
 
 export interface ImovelDto {
@@ -25,6 +25,17 @@ export interface ImovelDto {
   valorAluguelImovel: number;
   valor_imovel: number;
   listaDespesas: DespesaDto[];
+}
+
+export type CriarImovelDto = Omit<
+  ImovelDto,
+  "idImovel" | "listaDespesas"
+>;
+
+export interface LoginRequest {
+  nome: string;
+  email: string;
+  senha: string;
 }
 
 export interface ApiResponse<T> {

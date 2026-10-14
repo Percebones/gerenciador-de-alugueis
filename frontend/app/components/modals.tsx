@@ -62,7 +62,7 @@ function ModalCadImovel({
 
         {children}
 
-        <CadastrarImovel />
+       <CadastrarImovel onSuccess={onClose} />
       </div>
     </div>,
     document.body

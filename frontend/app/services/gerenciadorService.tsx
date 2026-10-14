@@ -10,6 +10,16 @@ import {
 const LOGIN_URL = "/api/v1/login";
 const IMOVEL_URL = "/api/v1/imovel";
 
+interface RespostaComMensagem {
+  mensagem?: unknown;
+  message?: unknown;
+}
+
+interface RespostaComImoveis {
+  imoveis?: unknown;
+  content?: unknown;
+}
+
 /**
  * Extrai uma mensagem legível de um erro retornado pelo Axios.
  */
@@ -18,6 +28,10 @@ const extrairMensagemErro = (
   mensagemPadrao: string
 ): string => {
   if (!axios.isAxiosError(erro)) {
+    if (erro instanceof Error) {
+      return erro.message;
+    }
+
     return mensagemPadrao;
   }
 
@@ -25,40 +39,75 @@ const extrairMensagemErro = (
     return "Não foi possível conectar ao servidor.";
   }
 
-  if (typeof erro.response.data === "string") {
-    return erro.response.data;
+  const dadosResposta: unknown = erro.response.data;
+
+  if (typeof dadosResposta === "string") {
+    return dadosResposta;
   }
 
-  /*
-   * Caso futuramente o backend retorne um JSON como:
-   *
-   * {
-   *   "mensagem": "Imóvel não encontrado."
-   * }
-   */
   if (
-    typeof erro.response.data === "object" &&
-    erro.response.data !== null &&
-    "mensagem" in erro.response.data &&
-    typeof erro.response.data.mensagem === "string"
+    typeof dadosResposta === "object" &&
+    dadosResposta !== null
   ) {
-    return erro.response.data.mensagem;
+    const resposta = dadosResposta as RespostaComMensagem;
+
+    if (typeof resposta.mensagem === "string") {
+      return resposta.mensagem;
+    }
+
+    if (typeof resposta.message === "string") {
+      return resposta.message;
+    }
   }
 
   return mensagemPadrao;
 };
 
 /**
- * Converte o identificador digitado em nome ou e-mail,
- * conforme o formato esperado pelo backend.
+ * Garante que a resposta da API seja transformada em uma
+ * lista válida de imóveis.
+ */
+const extrairListaImoveis = (
+  dadosResposta: unknown
+): ImovelDto[] => {
+  if (Array.isArray(dadosResposta)) {
+    return dadosResposta as ImovelDto[];
+  }
+
+  if (
+    typeof dadosResposta === "object" &&
+    dadosResposta !== null
+  ) {
+    const resposta = dadosResposta as RespostaComImoveis;
+
+    if (Array.isArray(resposta.imoveis)) {
+      return resposta.imoveis as ImovelDto[];
+    }
+
+    if (Array.isArray(resposta.content)) {
+      return resposta.content as ImovelDto[];
+    }
+  }
+
+  console.error(
+    "Formato inesperado recebido ao buscar imóveis:",
+    dadosResposta
+  );
+
+  throw new Error(
+    "O servidor não retornou uma lista válida de imóveis."
+  );
+};
+
+/**
+ * Converte o identificador digitado pelo usuário em nome
+ * ou e-mail, conforme o formato esperado pelo backend.
  */
 const montarUsuarioLogin = (
   identificador: string,
   senha: string
 ): LoginRequest => {
-  const identificadorNormalizado =
-    identificador.trim();
-
+  const identificadorNormalizado = identificador.trim();
   const identificadorEhEmail =
     identificadorNormalizado.includes("@");
 
@@ -66,15 +115,9 @@ const montarUsuarioLogin = (
     nome: identificadorEhEmail
       ? ""
       : identificadorNormalizado,
-
     email: identificadorEhEmail
       ? identificadorNormalizado
       : "",
-
-    /*
-     * A senha não recebe trim porque espaços podem
-     * fazer parte da credencial.
-     */
     senha,
   };
 };
@@ -101,7 +144,9 @@ export const gerenciadorService = {
       };
     } catch (erro: unknown) {
       return {
-        status: 500,
+        status: axios.isAxiosError(erro)
+          ? erro.response?.status ?? 500
+          : 500,
         mensagem: extrairMensagemErro(
           erro,
           "Não foi possível realizar o login."
@@ -110,31 +155,46 @@ export const gerenciadorService = {
     }
   },
 
-  buscarTodosImoveis:
-    async (): Promise<ImovelDto[]> => {
-      try {
-        const response = await api.get<ImovelDto[]>(
-          `${IMOVEL_URL}/buscaImovel`
-        );
+  buscarTodosImoveis: async (): Promise<ImovelDto[]> => {
+    try {
+      const response = await api.get<unknown>(
+        `${IMOVEL_URL}/buscaImovel`
+      );
 
-        return response.data;
-      } catch (erro: unknown) {
-        throw new Error(
-          extrairMensagemErro(
-            erro,
-            "Não foi possível buscar os imóveis."
-          )
-        );
-      }
-    },
+      return extrairListaImoveis(response.data);
+    } catch (erro: unknown) {
+      throw new Error(
+        extrairMensagemErro(
+          erro,
+          "Não foi possível buscar os imóveis."
+        )
+      );
+    }
+  },
 
   buscarImovelPorId: async (
     idImovel: number
   ): Promise<ImovelDto> => {
+    if (!Number.isInteger(idImovel) || idImovel <= 0) {
+      throw new Error(
+        "O ID do imóvel informado é inválido."
+      );
+    }
+
     try {
       const response = await api.get<ImovelDto>(
         `${IMOVEL_URL}/porID/${idImovel}`
       );
+
+      if (
+        typeof response.data !== "object" ||
+        response.data === null ||
+        Array.isArray(response.data)
+      ) {
+        throw new Error(
+          "O servidor não retornou um imóvel válido."
+        );
+      }
 
       return response.data;
     } catch (erro: unknown) {
@@ -170,7 +230,10 @@ export const gerenciadorService = {
   atualizarImovel: async (
     imovel: ImovelDto
   ): Promise<string> => {
-    if (!imovel.idImovel) {
+    if (
+      !Number.isInteger(imovel.idImovel) ||
+      imovel.idImovel <= 0
+    ) {
       throw new Error(
         "O ID do imóvel é obrigatório para atualização."
       );
@@ -196,7 +259,7 @@ export const gerenciadorService = {
   excluirImovel: async (
     idImovel: number
   ): Promise<string> => {
-    if (idImovel <= 0) {
+    if (!Number.isInteger(idImovel) || idImovel <= 0) {
       throw new Error(
         "O ID do imóvel informado é inválido."
       );

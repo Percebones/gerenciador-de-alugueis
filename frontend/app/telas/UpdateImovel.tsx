@@ -32,7 +32,7 @@ export function UpdateImovel({
 
   const [aluguel, setAluguel] = useState("");
   const [valorImovel, setValorImovel] = useState("");
-  const [status, setStatus] = useState("Vago");
+  const [status, setStatus] = useState<ImovelDto["statusImovel"]>("VAGO");
 
   const [atualizando, setAtualizando] =
     useState(false);
@@ -94,7 +94,7 @@ export function UpdateImovel({
     );
 
     setStatus(
-      imovel.statusImovel ?? "Vago"
+      imovel.statusImovel ?? "VAGO"
     );
 
     setAluguel(
@@ -379,17 +379,17 @@ export function UpdateImovel({
           selectedValue={status}
           enabled={!atualizando}
           onValueChange={(novoStatus) =>
-            setStatus(String(novoStatus))
+            setStatus(novoStatus as ImovelDto["statusImovel"])
           }
         >
           <Picker.Item
             label="Vago"
-            value="Vago"
+            value="VAGO"
           />
 
           <Picker.Item
             label="Alugado"
-            value="Alugado"
+            value="ALUGADO"
           />
         </Picker>
       </View>

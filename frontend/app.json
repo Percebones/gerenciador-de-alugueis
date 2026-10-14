@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "frontend",
-    "slug": "frontend",
+    "name": "Gerenciador de Aluguéis",
+    "slug": "gerenciador-de-alugueis",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "frontend",
+    "scheme": "gerenciador-de-alugueis",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

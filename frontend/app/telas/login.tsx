@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
   Button,
+  Platform,
   StyleSheet,
   Text,
   TextInput,
@@ -22,7 +23,10 @@ export default function Login({
   const [senha, setSenha] = useState("");
   const [carregando, setCarregando] = useState(false);
 
+
+
   const realizarLogin = async (): Promise<void> => {
+
     if (!login.trim()) {
       console.log("Login vazio:", login);
 
@@ -54,11 +58,11 @@ export default function Login({
       );
 
       if (resultado.status !== 200) {
-        Alert.alert("Login inválido",resultado.mensagem);
+        Alert.alert("Login inválido", resultado.mensagem);
         return;
       }
 
-      Alert.alert("Sucesso",resultado.mensagem);
+      Alert.alert("Sucesso", resultado.mensagem);
 
       onLoginRealizado();
     } catch (erro: unknown) {
