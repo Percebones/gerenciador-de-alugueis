@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,10 +32,10 @@ public class Imovel implements Serializable {
     private Status statusImovel;
 
     @Column(name = "valor_aluguel")
-    private BigInteger valorAluguelImovel;
+    private BigDecimal valorAluguelImovel;
 
     @Column(name = "valor_imovel")
-    private BigInteger valor_imovel;
+    private BigDecimal valor_imovel;
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_endereco", referencedColumnName = "id_endereco", unique = true)

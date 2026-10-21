@@ -2,27 +2,37 @@ package br.com.gerenciadorDeAlugueis.controllers;
 
 
 import br.com.gerenciadorDeAlugueis.dto.DespesaDTO;
+import br.com.gerenciadorDeAlugueis.exceptions.GerenciadorException;
 import br.com.gerenciadorDeAlugueis.models.Despesa;
+import br.com.gerenciadorDeAlugueis.models.Imovel;
 import br.com.gerenciadorDeAlugueis.service.DespesaService;
+import br.com.gerenciadorDeAlugueis.service.ImovelService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Optional;
 
 @RestController
 @RequestMapping(path = "/api/v1/despesa")
 public class DespesaController {
 
     private final DespesaService despesaService;
-
-    public DespesaController(DespesaService despesaService) {
+    private final ImovelService imovelService;
+    public DespesaController(DespesaService despesaService, ImovelService imovelService) {
         this.despesaService = despesaService;
+        this.imovelService = imovelService;
     }
 
-    @PostMapping
+    @PostMapping(path = "/cadastroDespesa")
     public ResponseEntity<String> cadDespesa(@RequestBody DespesaDTO despesaDTO) {
-        Despesa despesa = new Despesa();
         try {
-            despesa.setImovel(despesaDTO.imovel());
+            Imovel imovel = imovelService
+                    .findById(despesaDTO.idImovel())
+                    .orElseThrow(() -> new GerenciadorException("Imóvel não encontrado."));
+
+            Despesa despesa = new Despesa();
+            despesa.setImovel(imovel);
             despesa.setNomeDespesa(despesaDTO.nomeDespesa());
             despesa.setValorDespesa(despesaDTO.valorDespesa());
             despesaService.cadDespesa(despesa);

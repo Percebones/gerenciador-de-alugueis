@@ -9,6 +9,11 @@ import {
 } from "react-native";
 import { DataTable, IconButton, Text } from "react-native-paper";
 
+interface Props {
+  atualizacao: number;
+  atualizarTodos: () => void;
+}
+
 import {
   ModalCadImovel,
   ModalDelImovel,
@@ -92,7 +97,13 @@ function formatarMoeda(valor: unknown): string {
   });
 }
 
-export default function Lista() {
+export default function Lista({
+  atualizacao,
+  atualizarTodos,
+}: Props) {
+
+
+
   const [imoveis, setImoveis] = useState<ImovelDto[]>([]);
   const [carregando, setCarregando] = useState(true);
 
@@ -139,7 +150,7 @@ export default function Lista() {
 
   useEffect(() => {
     void buscarImoveis();
-  }, []);
+  }, [atualizacao]);
 
   const totalAlugueis = useMemo(() => {
     return imoveis.reduce((totalAtual, imovel) => {
@@ -157,24 +168,21 @@ export default function Lista() {
       return totalAtual + valorAluguel;
     }, 0);
   }, [imoveis]);
-
-  const fecharModalCadastro = async (): Promise<void> => {
+  const fecharModalCadastro = (): void => {
     setModalCadastroAberto(false);
-    await buscarImoveis();
+    atualizarTodos();
   };
 
-  const fecharModalEdicao = async (): Promise<void> => {
+  const fecharModalEdicao = (): void => {
     setModalEdicaoAberto(false);
     setImovelSelecionado(null);
-
-    await buscarImoveis();
+    atualizarTodos();
   };
 
-  const fecharModalExclusao = async (): Promise<void> => {
+  const fecharModalExclusao = (): void => {
     setModalExclusaoAberto(false);
     setIdImovelSelecionado(null);
-
-    await buscarImoveis();
+    atualizarTodos();
   };
 
   if (carregando) {

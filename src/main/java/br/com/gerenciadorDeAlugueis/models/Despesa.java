@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -30,12 +30,12 @@ public class Despesa implements Serializable {
     private String nomeDespesa;
 
     @Column(name = "valor_despesa", nullable = false)
-    private BigInteger valorDespesa;
+    private BigDecimal valorDespesa;
 
     public Despesa(
             Imovel imovel,
             String nomeDespesa,
-            BigInteger valorDespesa
+            BigDecimal valorDespesa
     ) {
         this.imovel = imovel;
         this.nomeDespesa = nomeDespesa;

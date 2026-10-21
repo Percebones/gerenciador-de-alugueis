@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.math.BigInteger;
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -29,7 +29,7 @@ public class Pagamento implements Serializable {
     private String mesPagamento;
 
     @Column(name = "valor_pagamento", nullable = false)
-    private BigInteger valorPagamento;
+    private BigDecimal valorPagamento;
 
     public Pagamento(PagamentoDTO pagamentoDto) {
         this.imovel = pagamentoDto.imovel();

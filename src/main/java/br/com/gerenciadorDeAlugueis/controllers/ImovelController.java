@@ -3,6 +3,7 @@ package br.com.gerenciadorDeAlugueis.controllers;
 
 import br.com.gerenciadorDeAlugueis.dto.ImovelDTO;
 import br.com.gerenciadorDeAlugueis.exceptions.GerenciadorException;
+import br.com.gerenciadorDeAlugueis.models.Despesa;
 import br.com.gerenciadorDeAlugueis.models.Imovel;
 import br.com.gerenciadorDeAlugueis.service.ImovelService;
 import org.springframework.http.HttpStatus;
@@ -58,7 +59,15 @@ public class ImovelController {
             imovel.setStatusImovel(imovelDto.statusImovel());
             imovel.setValor_imovel(imovelDto.valor_imovel());
             imovel.setEndereco(imovelDto.endereco());
-            imovel.setListaDespesas(imovelDto.listaDespesas());
+            List<Despesa> despesas = imovelDto.listaDespesas();
+            if (despesas != null) {
+                for (Despesa despesa : despesas) {
+                    if (despesa.getIdDespesa() != null) {
+                        despesa.setImovel(imovel);
+                    }
+                }
+            }
+            imovel.setListaDespesas(despesas);
             imovelService.save(imovel);
             return new ResponseEntity<>("Imovel atualizado com sucesso", HttpStatus.CREATED);
         } catch (GerenciadorException e) {

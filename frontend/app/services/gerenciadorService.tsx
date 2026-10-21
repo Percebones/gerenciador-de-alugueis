@@ -3,12 +3,14 @@ import api from "./api";
 
 import {
   CriarImovelDto,
+  DespesaDto,
   ImovelDto,
   LoginRequest,
 } from "../types/types";
 
 const LOGIN_URL = "/api/v1/login";
 const IMOVEL_URL = "/api/v1/imovel";
+const DESPESA_URL = "/api/v1/despesa";
 
 interface RespostaComMensagem {
   mensagem?: unknown;
@@ -230,15 +232,6 @@ export const gerenciadorService = {
   atualizarImovel: async (
     imovel: ImovelDto
   ): Promise<string> => {
-    if (
-      !Number.isInteger(imovel.idImovel) ||
-      imovel.idImovel <= 0
-    ) {
-      throw new Error(
-        "O ID do imóvel é obrigatório para atualização."
-      );
-    }
-
     try {
       const response = await api.post<string>(
         `${IMOVEL_URL}/updateImovel`,
@@ -276,6 +269,26 @@ export const gerenciadorService = {
         extrairMensagemErro(
           erro,
           "Não foi possível excluir o imóvel."
+        )
+      );
+    }
+  },
+
+  cadastrarDespesa: async (
+    despesa: DespesaDto
+  ): Promise<string> => {
+    try {
+      const response = await api.post<string>(
+        `${DESPESA_URL}/cadastroDespesa`,
+        despesa
+      );
+
+      return response.data;
+    } catch (erro: unknown) {
+      throw new Error(
+        extrairMensagemErro(
+          erro,
+          "Não foi possível cadastrar a despesa."
         )
       );
     }

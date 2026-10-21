@@ -8,10 +8,16 @@ import {
 } from "react-native";
 import { DataTable, Text } from "react-native-paper";
 
+interface Props {
+  atualizacao: number;
+}
+
 import { gerenciadorService } from "../services/gerenciadorService";
 import { ImovelDto } from "../types/types";
 
-export default function Pagamentos() {
+export default function Pagamentos({
+  atualizacao,
+}: Props) {
     const [imoveis, setImoveis] = useState<ImovelDto[]>([]);
     const [carregando, setCarregando] = useState(true);
 
@@ -41,8 +47,8 @@ export default function Pagamentos() {
     };
 
     useEffect(() => {
-        buscarImoveis();
-    }, []);
+        void buscarImoveis();
+    }, [atualizacao]);
 
     const imoveisAlugados = useMemo(() => {
         return imoveis.filter(

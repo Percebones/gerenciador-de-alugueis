@@ -31,8 +31,6 @@ public class UsuarioController {
             usuario.setNome(usuarioDTO.nome());
             usuario.setSenha(usuarioDTO.senha());
 
-
-
             if (usuarioService.login(usuario)) {
                 return new ResponseEntity<>("Usuário válido", HttpStatus.OK);
             } else {

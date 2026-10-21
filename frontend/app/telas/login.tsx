@@ -57,10 +57,14 @@ export default function Login({
         senha
       );
 
-      if (resultado.status !== 200) {
+    if (resultado.status !== 200) {
+      if (Platform.OS === "web") {
+        window.alert(`Login inválido\n\n${resultado.mensagem}`);
+      } else {
         Alert.alert("Login inválido", resultado.mensagem);
-        return;
       }
+      return;
+    }
 
       Alert.alert("Sucesso", resultado.mensagem);
 

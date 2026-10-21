@@ -64,7 +64,7 @@ export function CadastrarImovel({
   const [aluguel, setAluguel] = useState("");
   const [valorImovel, setValorImovel] = useState("");
   const [status, setStatus] =
-    useState<StatusImovel>("Vago" as StatusImovel);
+    useState<StatusImovel>("VAGO");
   const [cadastrando, setCadastrando] = useState(false);
 
   const formularioEstaValido = (): boolean => {
@@ -173,7 +173,8 @@ export function CadastrarImovel({
     setEstado("Parana");
     setAluguel("");
     setValorImovel("");
-    setStatus("Vago" as StatusImovel);
+    setStatus("VAGO");
+
   };
 
   const enviar = async (): Promise<void> => {
@@ -328,8 +329,8 @@ export function CadastrarImovel({
             setStatus(novoStatus as StatusImovel)
           }
         >
-          <Picker.Item label="Vago" value="Vago" />
-          <Picker.Item label="Alugado" value="Alugado" />
+          <Picker.Item label="Vago" value="VAGO" />
+          <Picker.Item label="Alugado" value="ALUGADO" />
         </Picker>
       </View>
 

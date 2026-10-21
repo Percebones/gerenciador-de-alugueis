@@ -2,14 +2,15 @@ package br.com.gerenciadorDeAlugueis.dto;
 
 import br.com.gerenciadorDeAlugueis.models.Imovel;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 
 public record DespesaDTO(
 
         Long idDespesa,
-        Imovel imovel,
+        Long idImovel,
         String nomeDespesa,
-        BigInteger valorDespesa
+        BigDecimal valorDespesa
         ) {
 
 

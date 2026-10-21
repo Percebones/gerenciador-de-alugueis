@@ -13,6 +13,7 @@ export interface EnderecoDto {
 
 export interface DespesaDto {
   idDespesa?: number;
+  idImovel: number;
   nomeDespesa: string;
   valorDespesa: number;
 }

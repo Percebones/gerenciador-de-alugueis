@@ -6,10 +6,11 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-import { DataTable, Text } from "react-native-paper";
+import { DataTable, IconButton, Text } from "react-native-paper";
 
 import { gerenciadorService } from "../services/gerenciadorService";
 import { ImovelDto } from "../types/types";
+import ModalCadDespesa from "./CadastroDespesa";
 
 interface DespesaConsolidadaPorImovel {
   idImovel: number;
@@ -18,6 +19,11 @@ interface DespesaConsolidadaPorImovel {
   totalCondominio: number;
   totalOutrasDespesas: number;
   totalDespesas: number;
+}
+
+interface Props {
+  atualizacao: number;
+  atualizarTodos: () => void;
 }
 
 interface TotaisGerais {
@@ -32,9 +38,7 @@ const converterParaNumero = (
 ): number => {
   const numeroConvertido = Number(valor ?? 0);
 
-  return Number.isFinite(numeroConvertido)
-    ? numeroConvertido
-    : 0;
+  return Number.isFinite(numeroConvertido) ? numeroConvertido : 0;
 };
 
 const formatarMoeda = (valor: number): string => {
@@ -54,64 +58,64 @@ const normalizarNomeDespesa = (
     .replace(/[\u0300-\u036f]/g, "");
 };
 
-export default function Despesas() {
+export default function Despesas({
+  atualizacao,
+  atualizarTodos,
+}: Props) {
   const [imoveis, setImoveis] = useState<ImovelDto[]>([]);
+  const [modalCadastroAberto, setModalCadastroAberto] = useState(false);
   const [carregando, setCarregando] = useState(true);
 
-  const buscarImoveis = useCallback(
-    async (): Promise<void> => {
-      try {
-        setCarregando(true);
+  const buscarImoveis = useCallback(async (): Promise<void> => {
+    try {
+      setCarregando(true);
 
-        const imoveisEncontrados =
-          await gerenciadorService.buscarTodosImoveis();
+      const imoveisEncontrados =
+        await gerenciadorService.buscarTodosImoveis();
 
-        if (!Array.isArray(imoveisEncontrados)) {
-          throw new Error(
-            "O servidor não retornou uma lista válida de imóveis."
-          );
-        }
-
-        setImoveis(imoveisEncontrados);
-      } catch (erro: unknown) {
-        console.error(
-          "Erro ao buscar os imóveis e suas despesas:",
-          erro
+      if (!Array.isArray(imoveisEncontrados)) {
+        throw new Error(
+          "O servidor não retornou uma lista válida de imóveis."
         );
-
-        setImoveis([]);
-
-        const mensagem =
-          erro instanceof Error
-            ? erro.message
-            : "Não foi possível carregar as despesas.";
-
-        Alert.alert("Erro", mensagem);
-      } finally {
-        setCarregando(false);
       }
-    },
-    []
-  );
+
+      setImoveis(imoveisEncontrados);
+    } catch (erro: unknown) {
+      console.error(
+        "Erro ao buscar os imóveis e suas despesas:",
+        erro
+      );
+
+      setImoveis([]);
+
+      const mensagem =
+        erro instanceof Error
+          ? erro.message
+          : "Não foi possível carregar as despesas.";
+
+      Alert.alert("Erro", mensagem);
+    } finally {
+      setCarregando(false);
+    }
+  }, []);
 
   useEffect(() => {
     void buscarImoveis();
-  }, [buscarImoveis]);
+  }, [buscarImoveis, atualizacao]);
 
   const despesasPorImovel = useMemo<
     DespesaConsolidadaPorImovel[]
   >(() => {
     return imoveis.map((imovel) => {
-      const despesasDoImovel = Array.isArray(
-        imovel.listaDespesas
-      )
+      const despesasDoImovel = Array.isArray(imovel.listaDespesas)
         ? imovel.listaDespesas
         : [];
 
       const totaisDoImovel = despesasDoImovel.reduce(
         (totaisAcumulados, despesa) => {
-          const nomeDespesaNormalizado =
-            normalizarNomeDespesa(despesa.nomeDespesa);
+          const nomeDespesaNormalizado = normalizarNomeDespesa(
+            despesa.nomeDespesa
+          );
 
           const valorDespesa = converterParaNumero(
             despesa.valorDespesa
@@ -119,13 +123,10 @@ export default function Despesas() {
 
           if (nomeDespesaNormalizado === "IPTU") {
             totaisAcumulados.totalIptu += valorDespesa;
-          } else if (
-            nomeDespesaNormalizado === "CONDOMINIO"
-          ) {
+          } else if (nomeDespesaNormalizado === "CONDOMINIO") {
             totaisAcumulados.totalCondominio += valorDespesa;
           } else {
-            totaisAcumulados.totalOutrasDespesas +=
-              valorDespesa;
+            totaisAcumulados.totalOutrasDespesas += valorDespesa;
           }
 
           totaisAcumulados.totalDespesas += valorDespesa;
@@ -142,12 +143,10 @@ export default function Despesas() {
 
       return {
         idImovel: imovel.idImovel,
-        nomeImovel:
-          imovel.nomeImovel?.trim() || "Imóvel sem nome",
+        nomeImovel: imovel.nomeImovel?.trim() || "Imóvel sem nome",
         totalIptu: totaisDoImovel.totalIptu,
         totalCondominio: totaisDoImovel.totalCondominio,
-        totalOutrasDespesas:
-          totaisDoImovel.totalOutrasDespesas,
+        totalOutrasDespesas: totaisDoImovel.totalOutrasDespesas,
         totalDespesas: totaisDoImovel.totalDespesas,
       };
     });
@@ -157,8 +156,7 @@ export default function Despesas() {
     return despesasPorImovel.reduce<TotaisGerais>(
       (totaisAcumulados, despesasDoImovel) => ({
         totalIptu:
-          totaisAcumulados.totalIptu +
-          despesasDoImovel.totalIptu,
+          totaisAcumulados.totalIptu + despesasDoImovel.totalIptu,
         totalCondominio:
           totaisAcumulados.totalCondominio +
           despesasDoImovel.totalCondominio,
@@ -178,6 +176,20 @@ export default function Despesas() {
     );
   }, [despesasPorImovel]);
 
+  const abrirCadastroDespesa = (): void => {
+    setModalCadastroAberto(true);
+  };
+
+  const fecharModalCadastro = (): void => {
+    setModalCadastroAberto(false);
+  };
+
+  const despesaCadastrada = async (): Promise<void> => {
+  setModalCadastroAberto(false);
+  await buscarImoveis();
+  atualizarTodos();
+};
+
   if (carregando) {
     return (
       <View style={styles.carregamento}>
@@ -192,6 +204,13 @@ export default function Despesas() {
 
   return (
     <View style={styles.container}>
+      <ModalCadDespesa
+        visivel={modalCadastroAberto}
+        imoveis={imoveis}
+        onClose={fecharModalCadastro}
+        onSuccess={despesaCadastrada}
+      />
+
       <Text style={styles.titulo}>Despesas dos Imóveis</Text>
 
       <Text style={styles.subtitulo}>
@@ -248,6 +267,17 @@ export default function Despesas() {
               >
                 TOTAL
               </DataTable.Title>
+
+              <View style={styles.colunaAcaoCabecalho}>
+                <IconButton
+                  icon="plus-circle-outline"
+                  size={26}
+                  iconColor="#2563EB"
+                  style={styles.botaoCadastrar}
+                  onPress={abrirCadastroDespesa}
+                  accessibilityLabel="Cadastrar nova despesa"
+                />
+              </View>
             </DataTable.Header>
 
             {despesasPorImovel.map((despesasDoImovel) => (
@@ -256,18 +286,12 @@ export default function Despesas() {
                 style={styles.linha}
               >
                 <DataTable.Cell style={styles.colunaImovel}>
-                  <Text
-                    style={styles.nomeImovel}
-                    numberOfLines={1}
-                  >
+                  <Text style={styles.nomeImovel} numberOfLines={1}>
                     {despesasDoImovel.nomeImovel}
                   </Text>
                 </DataTable.Cell>
 
-                <DataTable.Cell
-                  numeric
-                  style={styles.colunaValor}
-                >
+                <DataTable.Cell numeric style={styles.colunaValor}>
                   <Text
                     style={
                       despesasDoImovel.totalIptu > 0
@@ -280,10 +304,7 @@ export default function Despesas() {
                   </Text>
                 </DataTable.Cell>
 
-                <DataTable.Cell
-                  numeric
-                  style={styles.colunaValor}
-                >
+                <DataTable.Cell numeric style={styles.colunaValor}>
                   <Text
                     style={
                       despesasDoImovel.totalCondominio > 0
@@ -298,10 +319,7 @@ export default function Despesas() {
                   </Text>
                 </DataTable.Cell>
 
-                <DataTable.Cell
-                  numeric
-                  style={styles.colunaValor}
-                >
+                <DataTable.Cell numeric style={styles.colunaValor}>
                   <Text
                     style={
                       despesasDoImovel.totalOutrasDespesas > 0
@@ -316,10 +334,7 @@ export default function Despesas() {
                   </Text>
                 </DataTable.Cell>
 
-                <DataTable.Cell
-                  numeric
-                  style={styles.colunaValor}
-                >
+                <DataTable.Cell numeric style={styles.colunaValor}>
                   <Text
                     style={
                       despesasDoImovel.totalDespesas > 0
@@ -328,44 +343,33 @@ export default function Despesas() {
                     }
                     numberOfLines={1}
                   >
-                    {formatarMoeda(
-                      despesasDoImovel.totalDespesas
-                    )}
+                    {formatarMoeda(despesasDoImovel.totalDespesas)}
                   </Text>
                 </DataTable.Cell>
+
+                <DataTable.Cell style={styles.colunaAcao} />
               </DataTable.Row>
             ))}
 
             {despesasPorImovel.length > 0 && (
               <DataTable.Row style={styles.linhaTotal}>
                 <DataTable.Cell style={styles.colunaImovel}>
-                  <Text style={styles.descricaoTotal}>
-                    TOTAL GERAL
-                  </Text>
+                  <Text style={styles.descricaoTotal}>TOTAL GERAL</Text>
                 </DataTable.Cell>
 
-                <DataTable.Cell
-                  numeric
-                  style={styles.colunaValor}
-                >
+                <DataTable.Cell numeric style={styles.colunaValor}>
                   <Text style={styles.valorTotal} numberOfLines={1}>
                     {formatarMoeda(totaisGerais.totalIptu)}
                   </Text>
                 </DataTable.Cell>
 
-                <DataTable.Cell
-                  numeric
-                  style={styles.colunaValor}
-                >
+                <DataTable.Cell numeric style={styles.colunaValor}>
                   <Text style={styles.valorTotal} numberOfLines={1}>
                     {formatarMoeda(totaisGerais.totalCondominio)}
                   </Text>
                 </DataTable.Cell>
 
-                <DataTable.Cell
-                  numeric
-                  style={styles.colunaValor}
-                >
+                <DataTable.Cell numeric style={styles.colunaValor}>
                   <Text style={styles.valorTotal} numberOfLines={1}>
                     {formatarMoeda(
                       totaisGerais.totalOutrasDespesas
@@ -373,10 +377,7 @@ export default function Despesas() {
                   </Text>
                 </DataTable.Cell>
 
-                <DataTable.Cell
-                  numeric
-                  style={styles.colunaValor}
-                >
+                <DataTable.Cell numeric style={styles.colunaValor}>
                   <Text
                     style={styles.valorTotalGeral}
                     numberOfLines={1}
@@ -384,6 +385,8 @@ export default function Despesas() {
                     {formatarMoeda(totaisGerais.totalDespesas)}
                   </Text>
                 </DataTable.Cell>
+
+                <DataTable.Cell style={styles.colunaAcao} />
               </DataTable.Row>
             )}
           </DataTable>
@@ -442,14 +445,14 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   conteudoScroll: {
-  flexGrow: 1,
-  width: "100%",
-  paddingBottom: 16,
-},
-tabelaContainer: {
-  width: "100%",
-  minWidth: 900,
-},
+    flexGrow: 1,
+    width: "100%",
+    paddingBottom: 16,
+  },
+  tabelaContainer: {
+    width: "100%",
+    minWidth: 900,
+  },
   tabela: {
     width: "100%",
     overflow: "hidden",
@@ -495,6 +498,21 @@ tabelaContainer: {
   colunaValor: {
     flex: 2,
     paddingHorizontal: 20,
+  },
+  colunaAcao: {
+    flex: 1,
+    height: 64,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  colunaAcaoCabecalho: {
+    flex: 1,
+    height: 64,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  botaoCadastrar: {
+    margin: 0,
   },
   nomeImovel: {
     color: "#0F172A",

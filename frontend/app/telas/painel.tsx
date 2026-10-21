@@ -1,4 +1,5 @@
 import { ScrollView, View } from "react-native";
+import { useState } from "react";
 
 import Lista from "./ListaImoveis";
 import Despesas from "./Despesas";
@@ -9,17 +10,33 @@ interface PainelProps {
 }
 
 export default function Painel({ onSair }: PainelProps) {
+  const [atualizacao, setAtualizacao] = useState(0);
+
+  const atualizarTodos = (): void => {
+    setAtualizacao(valorAtual => valorAtual + 1);
+  };
+
   return (
     <ScrollView>
       <View>
-        <Lista />
+        <Lista
+          atualizacao={atualizacao}
+          atualizarTodos={atualizarTodos}
+        />
       </View>
+
       <View>
-        <Pagamentos />
+        <Pagamentos
+          atualizacao={atualizacao}
+        />
       </View>
-      <ScrollView>
-        <Despesas />
-      </ScrollView>
+
+      <View>
+        <Despesas
+          atualizacao={atualizacao}
+          atualizarTodos={atualizarTodos}
+        />
+      </View>
     </ScrollView>
   );
 }
